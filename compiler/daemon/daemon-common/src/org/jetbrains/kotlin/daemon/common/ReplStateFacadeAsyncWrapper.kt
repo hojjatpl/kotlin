@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.daemon.common
 
 import org.jetbrains.kotlin.cli.common.repl.ILineId
-import org.jetbrains.kotlin.daemon.common.impls.ReplStateFacade
 
 class ReplStateFacadeAsyncWrapper(val rmiReplStateFacade: ReplStateFacade) : ReplStateFacadeAsync {
 

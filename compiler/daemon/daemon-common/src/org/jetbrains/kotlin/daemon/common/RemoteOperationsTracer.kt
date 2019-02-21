@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.daemon.common.impls
+package org.jetbrains.kotlin.daemon.common
 
 import java.rmi.Remote
 import java.rmi.RemoteException

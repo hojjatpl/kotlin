@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import org.jetbrains.kotlin.cli.metadata.K2MetadataCompiler
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.findPortForSocket
-import org.jetbrains.kotlin.daemon.common.impls.ensureServerHostnameIsSetUp
+import org.jetbrains.kotlin.daemon.common.ensureServerHostnameIsSetUp
 import java.io.File
 import java.io.IOException
 import java.io.OutputStream

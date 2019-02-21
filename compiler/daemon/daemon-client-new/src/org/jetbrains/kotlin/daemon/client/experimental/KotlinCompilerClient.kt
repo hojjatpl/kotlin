@@ -9,7 +9,7 @@ import io.ktor.network.sockets.Socket
 import kotlinx.coroutines.*
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.daemon.client.CompileServiceSession
+import org.jetbrains.kotlin.daemon.client.CompileServiceSessionAsync
 import org.jetbrains.kotlin.daemon.client.KotlinCompilerDaemonClient
 import org.jetbrains.kotlin.daemon.client.DaemonReportMessage
 import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.daemon.common.Profiler
 import org.jetbrains.kotlin.daemon.common.experimental.*
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.Server
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.ServerSocketWrapper
-import org.jetbrains.kotlin.daemon.common.impls.*
+import org.jetbrains.kotlin.daemon.common.*
 import java.io.File
 import java.io.Serializable
 import java.net.SocketException
@@ -107,7 +107,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
         autostart: Boolean,
         leaseSession: Boolean,
         sessionAliveFlagFile: File?
-    ): CompileServiceSession? {
+    ): CompileServiceSessionAsync? {
         return connectLoop(
             reportingTargets,
             autostart
@@ -115,7 +115,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
 
             log.info("connectAndLease")
 
-            fun CompileServiceAsync.leaseImpl(): Deferred<CompileServiceSession?> =
+            fun CompileServiceAsync.leaseImpl(): Deferred<CompileServiceSessionAsync?> =
                 GlobalScope.async {
                     // the newJVMOptions could be checked here for additional parameters, if needed
                     log.info("trying registerClient")
@@ -127,7 +127,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                     }
                     reportingTargets.report(DaemonReportCategory.DEBUG, "connected to the daemon")
                     if (!leaseSession)
-                        org.jetbrains.kotlin.daemon.client.CompileServiceSession(this@leaseImpl, CompileService.NO_SESSION)
+                        CompileServiceSessionAsync(this@leaseImpl, CompileService.NO_SESSION)
                     else
                         try {
                             leaseCompileSession(sessionAliveFlagFile?.absolutePath)
@@ -136,7 +136,7 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
                         }
                             .takeUnless { it is CompileService.CallResult.Dying }
                             ?.let {
-                                org.jetbrains.kotlin.daemon.client.CompileServiceSession(this@leaseImpl, it.get())
+                                CompileServiceSessionAsync(this@leaseImpl, it.get())
                             }
                 }
 
@@ -182,48 +182,48 @@ class KotlinCompilerClient : KotlinCompilerDaemonClient {
     override suspend fun leaseCompileSession(compilerService: CompileServiceAsync, aliveFlagPath: String?): Int =
         compilerService.leaseCompileSession(aliveFlagPath).get()
 
-    override suspend fun releaseCompileSession(compilerService: CompileServiceAsync, sessionId: Int) =
+    override suspend fun releaseCompileSession(compilerService: CompileServiceAsync, sessionId: Int) {
         compilerService.releaseCompileSession(sessionId)
+    }
 
     override suspend fun compile(
-        compilerService: CompileServiceAsync,
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        messageCollector: MessageCollector,
-        outputsCollector: ((File, List<File>) -> Unit)?,
-        compilerMode: CompilerMode,
-        reportSeverity: ReportSeverity,
-        profiler: Profiler
+            compilerService: CompileServiceAsync,
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            messageCollector: MessageCollector,
+            outputsCollector: ((File, List<File>) -> Unit)?,
+            compilerMode: CompilerMode,
+            reportSeverity: ReportSeverity,
+            port: Int,
+            profiler: Profiler
     ): Int = profiler.withMeasure(this) {
         val services = BasicCompilerServicesWithResultsFacadeServerServerSide(
             messageCollector,
             outputsCollector,
             findCallbackServerSocket()
         )
-        services.runServer()
-        compilerService.compile(
-            sessionId,
-            args,
-            CompilationOptions(
-                compilerMode,
-                targetPlatform,
-                arrayOf(
-                    ReportCategory.COMPILER_MESSAGE.code,
-                    ReportCategory.DAEMON_MESSAGE.code,
-                    ReportCategory.EXCEPTION.code,
-                    ReportCategory.OUTPUT_MESSAGE.code
-                ),
-                reportSeverity.code,
-                emptyArray()
-            ),
-            services.clientSide,
-            createCompResults().clientSide
-        )
-            .get()
-            .also {
-                log.info("CODE = $it")
-            }
+        runBlocking {
+            services.runServer()
+            compilerService.compile(
+                    sessionId,
+                    args,
+                    CompilationOptions(
+                            compilerMode,
+                            targetPlatform,
+                            arrayOf(
+                                    ReportCategory.COMPILER_MESSAGE.code,
+                                    ReportCategory.DAEMON_MESSAGE.code,
+                                    ReportCategory.EXCEPTION.code,
+                                    ReportCategory.OUTPUT_MESSAGE.code
+                            ),
+                            reportSeverity.code,
+                            emptyArray()
+                    ),
+                    services.clientSide,
+                    createCompResults().clientSide
+            ).get()
+        }
     }
 
     val COMPILE_DAEMON_CLIENT_OPTIONS_PROPERTY: String = "kotlin.daemon.client.options"

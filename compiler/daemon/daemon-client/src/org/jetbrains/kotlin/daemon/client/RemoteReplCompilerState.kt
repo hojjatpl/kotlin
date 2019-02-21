@@ -17,7 +17,7 @@
 package org.jetbrains.kotlin.daemon.client
 
 import org.jetbrains.kotlin.cli.common.repl.*
-import org.jetbrains.kotlin.daemon.common.impls.ReplStateFacade
+import org.jetbrains.kotlin.daemon.common.ReplStateFacade
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -52,8 +52,8 @@ class RemoteReplCompilerStateHistory(private val state: RemoteReplCompilerState)
 }
 
 class RemoteReplCompilerState(
-    internal val replStateFacade: ReplStateFacade,
-    override val lock: ReentrantReadWriteLock = ReentrantReadWriteLock()
+        internal val replStateFacade: ReplStateFacade,
+        override val lock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 ) : IReplStageState<Unit> {
 
     override val currentGeneration: Int get() = (history as RemoteReplCompilerStateHistory).currentGeneration.get()

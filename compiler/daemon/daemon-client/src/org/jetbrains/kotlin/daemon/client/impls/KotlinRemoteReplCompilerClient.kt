@@ -11,9 +11,9 @@ import org.jetbrains.kotlin.cli.common.repl.experimental.ReplCompiler
 import org.jetbrains.kotlin.daemon.client.BasicCompilerServicesWithResultsFacadeServer
 import org.jetbrains.kotlin.daemon.client.RemoteReplCompilerState
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.ReportCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
-import org.jetbrains.kotlin.daemon.common.impls.SOCKET_ANY_FREE_PORT
+import org.jetbrains.kotlin.daemon.common.ReportCategory
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.SOCKET_ANY_FREE_PORT
 import java.io.File
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -35,16 +35,16 @@ open class KotlinRemoteReplCompilerClientImpl(
         clientAliveFlagFile?.absolutePath,
         args,
         CompilationOptions(
-            CompilerMode.NON_INCREMENTAL_COMPILER,
-            targetPlatform,
-            arrayOf(
-                ReportCategory.COMPILER_MESSAGE.code,
-                ReportCategory.DAEMON_MESSAGE.code,
-                ReportCategory.EXCEPTION.code,
-                ReportCategory.OUTPUT_MESSAGE.code
+                CompilerMode.NON_INCREMENTAL_COMPILER,
+                targetPlatform,
+                arrayOf(
+                        ReportCategory.COMPILER_MESSAGE.code,
+                        ReportCategory.DAEMON_MESSAGE.code,
+                        ReportCategory.EXCEPTION.code,
+                        ReportCategory.OUTPUT_MESSAGE.code
             ),
-            ReportSeverity.INFO.code,
-            emptyArray()
+                ReportSeverity.INFO.code,
+                emptyArray()
         ),
         services,
         templateClasspath,

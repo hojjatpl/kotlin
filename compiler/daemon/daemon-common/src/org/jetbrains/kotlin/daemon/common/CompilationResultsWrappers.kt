@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.daemon.common
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.daemon.common.impls.CompilationResults
 import java.io.Serializable
 
 class CompilationResultsAsyncWrapper(val rmiImpl: CompilationResults) : CompilationResultsAsync {

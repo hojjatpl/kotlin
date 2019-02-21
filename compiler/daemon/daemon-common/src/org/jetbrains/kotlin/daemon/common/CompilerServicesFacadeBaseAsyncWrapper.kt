@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.daemon.common
 
-import org.jetbrains.kotlin.daemon.common.impls.CompilerServicesFacadeBase
 import java.io.Serializable
 
 

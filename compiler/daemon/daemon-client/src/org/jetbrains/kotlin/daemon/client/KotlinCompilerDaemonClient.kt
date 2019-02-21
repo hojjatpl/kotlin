@@ -8,8 +8,14 @@ package org.jetbrains.kotlin.daemon.client
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.daemon.client.KotlinCompilerDaemonClient.Companion.instantiate
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.DummyProfiler
+import org.jetbrains.kotlin.daemon.common.Profiler
 import java.io.File
+
+data class CompileServiceSessionAsync(val compileService: CompileServiceAsync, val sessionId: Int)
+
+fun CompileServiceSession.toAsync() = CompileServiceSessionAsync(this.compileService.toClient(), this.sessionId)
 
 interface KotlinCompilerDaemonClient {
     suspend fun connectToCompileService(
@@ -39,22 +45,23 @@ interface KotlinCompilerDaemonClient {
         autostart: Boolean,
         leaseSession: Boolean,
         sessionAliveFlagFile: File? = null
-    ): CompileServiceSession?
+    ): CompileServiceSessionAsync?
 
     suspend fun shutdownCompileService(compilerId: CompilerId, daemonOptions: DaemonOptions)
 
     suspend fun leaseCompileSession(compilerService: CompileServiceAsync, aliveFlagPath: String?): Int
-    suspend fun releaseCompileSession(compilerService: CompileServiceAsync, sessionId: Int): CompileService.CallResult<Unit>
+    suspend fun releaseCompileSession(compilerService: CompileServiceAsync, sessionId: Int): Unit
     suspend fun compile(
-        compilerService: CompileServiceAsync,
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        messageCollector: MessageCollector,
-        outputsCollector: ((File, List<File>) -> Unit)? = null,
-        compilerMode: CompilerMode = CompilerMode.NON_INCREMENTAL_COMPILER,
-        reportSeverity: ReportSeverity = ReportSeverity.INFO,
-        profiler: Profiler = DummyProfiler()
+            compilerService: CompileServiceAsync,
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            messageCollector: MessageCollector,
+            outputsCollector: ((File, List<File>) -> Unit)? = null,
+            compilerMode: CompilerMode = CompilerMode.NON_INCREMENTAL_COMPILER,
+            reportSeverity: ReportSeverity = ReportSeverity.INFO,
+            port: Int = SOCKET_ANY_FREE_PORT,
+            profiler: Profiler = DummyProfiler()
     ): Int
 
     fun getOrCreateClientFlagFile(daemonOptions: DaemonOptions): File
@@ -69,7 +76,7 @@ interface KotlinCompilerDaemonClient {
                 .classLoader
                 .loadClass(
                     when(version) {
-                        Version.RMI -> "org.jetbrains.kotlin.daemon.client.KotlinCompilerClient"
+                        Version.RMI -> "org.jetbrains.kotlin.daemon.client.impls.KotlinCompilerClientImpl"
                         Version.SOCKETS -> "org.jetbrains.kotlin.daemon.client.experimental.KotlinCompilerClient"
                     }
                 )

@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlin.daemon.common.experimental
 
-import org.jetbrains.kotlin.daemon.common.impls.RemoteInputStream
-import org.jetbrains.kotlin.daemon.common.impls.RemoteOutputStream
+import org.jetbrains.kotlin.daemon.common.RemoteInputStream
+import org.jetbrains.kotlin.daemon.common.RemoteOutputStream
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.Client
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.DefaultClientRMIWrapper
 

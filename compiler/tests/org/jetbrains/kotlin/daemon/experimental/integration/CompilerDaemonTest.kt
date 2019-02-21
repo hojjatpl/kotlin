@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.CompileServiceAsyncWrapper
 import org.jetbrains.kotlin.daemon.common.CompileServiceAsync
 import org.jetbrains.kotlin.daemon.common.experimental.findCallbackServerSocket
-import org.jetbrains.kotlin.daemon.common.impls.*
 import org.jetbrains.kotlin.integration.KotlinIntegrationTestBase
 import org.jetbrains.kotlin.progress.experimental.CompilationCanceledStatus
 import org.jetbrains.kotlin.test.KotlinTestUtils
@@ -1019,16 +1018,16 @@ class CompilerDaemonTest : KotlinIntegrationTestBase() {
                         CompileService.NO_SESSION,
                         arrayOf("-include-runtime", file.absolutePath, "-d", jar),
                         CompilationOptions(
-                            CompilerMode.JPS_COMPILER,
-                            CompileService.TargetPlatform.JVM,
-                            arrayOf(
-                                ReportCategory.COMPILER_MESSAGE.code,
-                                ReportCategory.DAEMON_MESSAGE.code,
-                                ReportCategory.EXCEPTION.code,
-                                ReportCategory.OUTPUT_MESSAGE.code
+                                CompilerMode.JPS_COMPILER,
+                                CompileService.TargetPlatform.JVM,
+                                arrayOf(
+                                        ReportCategory.COMPILER_MESSAGE.code,
+                                        ReportCategory.DAEMON_MESSAGE.code,
+                                        ReportCategory.EXCEPTION.code,
+                                        ReportCategory.OUTPUT_MESSAGE.code
                             ),
-                            ReportSeverity.DEBUG.code,
-                            emptyArray()
+                                ReportSeverity.DEBUG.code,
+                                emptyArray()
                         ),
                         callbackServices.clientSide,
                         kotlinCompilerClientInstance.createCompResults().clientSide
@@ -1248,9 +1247,9 @@ class CompilerDaemonTest : KotlinIntegrationTestBase() {
         onShutdown: () -> Unit = {}
     ) {
         val (registry, serverPort) = findPortAndCreateRegistry(
-            COMPILE_DAEMON_FIND_PORT_ATTEMPTS,
-            COMPILE_DAEMON_PORTS_RANGE_START,
-            COMPILE_DAEMON_PORTS_RANGE_END
+                COMPILE_DAEMON_FIND_PORT_ATTEMPTS,
+                COMPILE_DAEMON_PORTS_RANGE_START,
+                COMPILE_DAEMON_PORTS_RANGE_END
         )
         val compilerSelector = object : CompilerSelector {
             private val jvm by lazy { K2JVMCompiler() }

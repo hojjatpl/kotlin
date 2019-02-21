@@ -27,10 +27,10 @@ import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.CompileServiceAsync
 import org.jetbrains.kotlin.daemon.common.experimental.LoopbackNetworkInterface
-import org.jetbrains.kotlin.daemon.common.impls.LOG_PREFIX_ASSUMING_OTHER_DAEMONS_HAVE
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
-import org.jetbrains.kotlin.daemon.common.impls.SOCKET_ANY_FREE_PORT
-import org.jetbrains.kotlin.daemon.common.impls.findPortAndCreateRegistry
+import org.jetbrains.kotlin.daemon.common.LOG_PREFIX_ASSUMING_OTHER_DAEMONS_HAVE
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.SOCKET_ANY_FREE_PORT
+import org.jetbrains.kotlin.daemon.common.findPortAndCreateRegistry
 import org.jetbrains.kotlin.daemon.experimental.integration.TestMessageCollector
 import org.jetbrains.kotlin.daemon.experimental.integration.assertHasMessage
 import org.jetbrains.kotlin.integration.KotlinIntegrationTestBase

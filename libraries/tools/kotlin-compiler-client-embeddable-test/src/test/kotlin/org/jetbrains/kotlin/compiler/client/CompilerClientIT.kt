@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.daemon.common.CompileService
 import org.jetbrains.kotlin.daemon.common.CompilerId
 import org.jetbrains.kotlin.daemon.common.DaemonOptions
 import org.jetbrains.kotlin.daemon.common.Version
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder

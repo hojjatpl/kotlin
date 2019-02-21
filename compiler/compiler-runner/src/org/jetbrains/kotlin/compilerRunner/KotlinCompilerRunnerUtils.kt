@@ -21,11 +21,14 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.daemon.client.*
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.DaemonReportCategory
+import org.jetbrains.kotlin.daemon.common.DaemonReportCategory
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.kotlin.daemon.common.DummyProfiler
+import org.jetbrains.kotlin.daemon.common.Profiler
+import org.jetbrains.kotlin.daemon.common.WallAndThreadAndMemoryTotalProfiler
 
 object KotlinCompilerRunnerUtils {
     fun exitCodeFromProcessExitCode(log: KotlinLogger, code: Int): ExitCode {

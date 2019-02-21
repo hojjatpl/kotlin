@@ -1,9 +1,9 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.daemon.common.impls
+package org.jetbrains.kotlin.daemon.common
 
 import java.io.IOException
 import java.io.Serializable
@@ -141,8 +141,8 @@ fun findPortAndCreateRegistry(attempts: Int, portRangeStart: Int, portRangeEnd: 
 fun ensureServerHostnameIsSetUp() {
     if (System.getProperty(JAVA_RMI_SERVER_HOSTNAME) == null) {
         System.setProperty(
-            JAVA_RMI_SERVER_HOSTNAME,
-            LoopbackNetworkInterface.loopbackInetAddressName
+                JAVA_RMI_SERVER_HOSTNAME,
+                LoopbackNetworkInterface.loopbackInetAddressName
         )
     }
 }

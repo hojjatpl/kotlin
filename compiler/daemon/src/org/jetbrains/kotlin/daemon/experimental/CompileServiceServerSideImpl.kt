@@ -43,9 +43,7 @@ import org.jetbrains.kotlin.daemon.common.Profiler
 import org.jetbrains.kotlin.daemon.common.WallAndThreadAndMemoryTotalProfiler
 import org.jetbrains.kotlin.daemon.common.WallAndThreadTotalProfiler
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.*
-import org.jetbrains.kotlin.daemon.common.impls.*
 import org.jetbrains.kotlin.daemon.nowSeconds
-import org.jetbrains.kotlin.daemon.report.RemoteICReporter
 import org.jetbrains.kotlin.daemon.report.experimental.CompileServicesFacadeMessageCollector
 import org.jetbrains.kotlin.daemon.report.experimental.DaemonMessageReporterAsync
 import org.jetbrains.kotlin.daemon.report.experimental.RemoteICReporterAsync
@@ -372,9 +370,9 @@ class CompileServiceServerSideImpl(
         runFile = File(
             runFileDir,
             makeRunFilenameString(
-                timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
-                digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
-                port = port.toString()
+                    timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
+                    digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
+                    port = port.toString()
             )
         )
         try {
@@ -1037,10 +1035,10 @@ class CompileServiceServerSideImpl(
     }
 
     private fun doCompile(
-        sessionId: Int,
-        daemonMessageReporterAsync: DaemonMessageReporterAsync,
-        tracer: RemoteOperationsTracer?,
-        body: suspend (EventManager, Profiler) -> ExitCode
+            sessionId: Int,
+            daemonMessageReporterAsync: DaemonMessageReporterAsync,
+            tracer: RemoteOperationsTracer?,
+            body: suspend (EventManager, Profiler) -> ExitCode
     ): Deferred<CompileService.CallResult<Int>> = GlobalScope.async {
         log.info("alive!")
         withValidClientOrSessionProxy(sessionId) {
@@ -1090,9 +1088,9 @@ class CompileServiceServerSideImpl(
 
 
     private fun <R> checkedCompile(
-        daemonMessageReporterAsync: DaemonMessageReporterAsync,
-        rpcProfiler: Profiler,
-        body: suspend () -> R
+            daemonMessageReporterAsync: DaemonMessageReporterAsync,
+            rpcProfiler: Profiler,
+            body: suspend () -> R
     ): Deferred<R> = GlobalScope.async {
         try {
             log.info("checkedCompile")

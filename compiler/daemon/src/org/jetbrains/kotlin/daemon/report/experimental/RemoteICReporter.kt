@@ -10,9 +10,9 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.daemon.common.CompilationOptions
 import org.jetbrains.kotlin.daemon.common.CompilationResultsAsync
 import org.jetbrains.kotlin.daemon.common.CompilerServicesFacadeBaseAsync
-import org.jetbrains.kotlin.daemon.common.impls.CompilationResultCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.CompilationResultCategory
+import org.jetbrains.kotlin.daemon.common.ReportCategory
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
 import org.jetbrains.kotlin.daemon.common.report
 import org.jetbrains.kotlin.incremental.ICReporter
 import java.io.File
@@ -40,8 +40,8 @@ internal class RemoteICReporterAsync(
         if (shouldReportCompileIteration) {
             GlobalScope.async {
                 compilationResults?.add(
-                    CompilationResultCategory.IC_COMPILE_ITERATION.code,
-                    CompileIterationResult(sourceFiles, exitCode.toString())
+                        CompilationResultCategory.IC_COMPILE_ITERATION.code,
+                        CompileIterationResult(sourceFiles, exitCode.toString())
                 )
             }
         }

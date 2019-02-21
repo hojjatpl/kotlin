@@ -1,31 +1,31 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.daemon.common
+package org.jetbrains.kotlin.daemon.common.impls
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.daemon.common.impls.*
+import org.jetbrains.kotlin.daemon.common.*
 import java.lang.management.ManagementFactory
 import java.lang.management.ThreadMXBean
 
-interface Profiler {
+interface ProfilerAsync {
     fun getCounters(): Map<Any?, PerfCounters>
     fun getTotalCounters(): PerfCounters
 
     suspend fun <R> withMeasure(obj: Any?, body: suspend () -> R): R
 }
 
-class DummyProfiler : Profiler {
+class DummyProfilerAsync : ProfilerAsync {
     override fun getCounters(): Map<Any?, PerfCounters> = mapOf(null to SimplePerfCounters())
     override fun getTotalCounters(): PerfCounters =
-        SimplePerfCounters()
+            SimplePerfCounters()
 
     override suspend fun <R> withMeasure(obj: Any?, body: suspend () -> R): R = body()
 }
 
-abstract class TotalProfiler : Profiler {
+abstract class TotalProfilerAsync : ProfilerAsync {
 
     val total = SimplePerfCounters()
     val threadMXBean = ManagementFactory.getThreadMXBean()
@@ -34,11 +34,11 @@ abstract class TotalProfiler : Profiler {
     override fun getTotalCounters(): PerfCounters = total
 }
 
-suspend fun <R> withMeasureWallAndThreadTimesAndMemory(
-    perfCounters: PerfCounters,
-    withGC: Boolean = false,
-    threadMXBean: ThreadMXBean,
-    body: suspend () -> R
+suspend fun <R> withMeasureWallAndThreadTimesAndMemoryAsync(
+        perfCounters: PerfCounters,
+        withGC: Boolean = false,
+        threadMXBean: ThreadMXBean,
+        body: suspend () -> R
 ): R {
     val startMem = usedMemory(withGC)
     val startTime = System.nanoTime()
@@ -57,10 +57,10 @@ suspend fun <R> withMeasureWallAndThreadTimesAndMemory(
     return res
 }
 
-suspend fun <R> withMeasureWallAndThreadTimes(
-    perfCounters: PerfCounters,
-    threadMXBean: ThreadMXBean,
-    body: suspend () -> R
+suspend fun <R> withMeasureWallAndThreadTimesAsync(
+        perfCounters: PerfCounters,
+        threadMXBean: ThreadMXBean,
+        body: suspend () -> R
 ): R {
     val startTime = System.nanoTime()
     val startThreadTime = threadMXBean.threadCpuTime()
@@ -77,22 +77,22 @@ suspend fun <R> withMeasureWallAndThreadTimes(
     return res
 }
 
-class WallAndThreadTotalProfiler : TotalProfiler() {
+class WallAndThreadTotalProfilerAsync : TotalProfilerAsync() {
     override suspend fun <R> withMeasure(obj: Any?, body: suspend () -> R): R =
-        withMeasureWallAndThreadTimes(
-            total,
-            threadMXBean,
-            body
-        )
+            withMeasureWallAndThreadTimesAsync(
+                    total,
+                    threadMXBean,
+                    body
+            )
 }
 
 
-class WallAndThreadAndMemoryTotalProfiler(val withGC: Boolean) : TotalProfiler() {
+class WallAndThreadAndMemoryTotalProfilerAsync(val withGC: Boolean) : TotalProfilerAsync() {
     override suspend fun <R> withMeasure(obj: Any?, body: suspend () -> R): R =
-        withMeasureWallAndThreadTimesAndMemory(total, withGC, threadMXBean, body)
+            withMeasureWallAndThreadTimesAndMemoryAsync(total, withGC, threadMXBean, body)
 }
 
 
-fun <R> Profiler.withMeasureBlocking(obj: Any?, body: suspend () -> R): R = runBlocking {
+fun <R> ProfilerAsync.withMeasureBlocking(obj: Any?, body: suspend () -> R): R = runBlocking {
     this@withMeasureBlocking.withMeasure<R>(obj, body)
 }

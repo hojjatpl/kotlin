@@ -16,8 +16,7 @@
 
 package org.jetbrains.kotlin.daemon.client
 
-import org.jetbrains.kotlin.daemon.client.impls.report
-import org.jetbrains.kotlin.daemon.common.impls.DaemonReportCategory
+import org.jetbrains.kotlin.daemon.common.DaemonReportCategory
 import java.io.IOException
 
 class NativePlatformLauncherWrapper {
@@ -44,30 +43,30 @@ fun launchProcessWithFallback(
         NativePlatformLauncherWrapper().launch(processBuilder)
     } catch (e: UnsatisfiedLinkError) {
         reportingTargets.report(
-            DaemonReportCategory.DEBUG,
-            "Could not start process with native process launcher, falling back to ProcessBuilder#start ($e)",
-            reportingSource
+                DaemonReportCategory.DEBUG,
+                "Could not start process with native process launcher, falling back to ProcessBuilder#start ($e)",
+                reportingSource
         )
         null
     } catch (e: IOException) {
         reportingTargets.report(
-            DaemonReportCategory.DEBUG,
-            "Could not start process with native process launcher, falling back to ProcessBuilder#start (${e.cause})",
-            reportingSource
+                DaemonReportCategory.DEBUG,
+                "Could not start process with native process launcher, falling back to ProcessBuilder#start (${e.cause})",
+                reportingSource
         )
         null
     } catch (e: NoClassDefFoundError) {
         reportingTargets.report(
-            DaemonReportCategory.DEBUG,
-            "net.rubygrapefruit.platform library is not in the classpath, falling back to ProcessBuilder#start ($e)",
-            reportingSource
+                DaemonReportCategory.DEBUG,
+                "net.rubygrapefruit.platform library is not in the classpath, falling back to ProcessBuilder#start ($e)",
+                reportingSource
         )
         null
     } catch (e: ClassNotFoundException) {
         reportingTargets.report(
-            DaemonReportCategory.DEBUG,
-            "net.rubygrapefruit.platform library is not in the classpath, falling back to ProcessBuilder#start ($e)",
-            reportingSource
+                DaemonReportCategory.DEBUG,
+                "net.rubygrapefruit.platform library is not in the classpath, falling back to ProcessBuilder#start ($e)",
+                reportingSource
         )
         null
     }

@@ -18,7 +18,7 @@ package org.jetbrains.kotlin.daemon.experimental
 
 import org.jetbrains.kotlin.daemon.common.DummyProfiler
 import org.jetbrains.kotlin.daemon.common.Profiler
-import org.jetbrains.kotlin.daemon.common.impls.RmiFriendlyCompilationCanceledException
+import org.jetbrains.kotlin.daemon.common.RmiFriendlyCompilationCanceledException
 import org.jetbrains.kotlin.daemon.common.experimental.CompilerCallbackServicesFacadeClientSide
 import org.jetbrains.kotlin.progress.CompilationCanceledException
 import org.jetbrains.kotlin.progress.experimental.CompilationCanceledStatus

@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.daemon.common
 
-import org.jetbrains.kotlin.daemon.common.impls.ReportCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
 import java.io.Serializable
 
 interface CompilerServicesFacadeBaseAsync {
@@ -17,10 +15,10 @@ interface CompilerServicesFacadeBaseAsync {
 }
 
 suspend fun CompilerServicesFacadeBaseAsync.report(
-    category: ReportCategory,
-    severity: ReportSeverity,
-    message: String? = null,
-    attachment: Serializable? = null
+        category: ReportCategory,
+        severity: ReportSeverity,
+        message: String? = null,
+        attachment: Serializable? = null
 ) {
     report(category.code, severity.code, message, attachment)
 }

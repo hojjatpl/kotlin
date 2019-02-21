@@ -1,9 +1,20 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
+ * Copyright 2010-2015 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package org.jetbrains.kotlin.daemon.common.impls
+package org.jetbrains.kotlin.daemon.common
 
 import java.lang.management.ManagementFactory
 import java.lang.management.ThreadMXBean
@@ -96,8 +107,7 @@ inline fun<R> withMeasureWallAndThreadTimes(perfCounters: PerfCounters, threadMX
     return res
 }
 
-inline fun<R> withMeasureWallAndThreadTimes(perfCounters: PerfCounters, body: () -> R): R =
-    withMeasureWallAndThreadTimes(perfCounters, ManagementFactory.getThreadMXBean(), body)
+inline fun<R> withMeasureWallAndThreadTimes(perfCounters: PerfCounters, body: () -> R): R = withMeasureWallAndThreadTimes(perfCounters, ManagementFactory.getThreadMXBean(), body)
 
 
 inline fun<R> withMeasureWallAndThreadTimesAndMemory(perfCounters: PerfCounters, withGC: Boolean = false, threadMXBean: ThreadMXBean, body: () -> R): R {
@@ -117,18 +127,12 @@ inline fun<R> withMeasureWallAndThreadTimesAndMemory(perfCounters: PerfCounters,
 }
 
 inline fun<R> withMeasureWallAndThreadTimesAndMemory(perfCounters: PerfCounters, withGC: Boolean, body: () -> R): R =
-    withMeasureWallAndThreadTimesAndMemory(
-        perfCounters,
-        withGC,
-        ManagementFactory.getThreadMXBean(),
-        body
-    )
+        withMeasureWallAndThreadTimesAndMemory(perfCounters, withGC, ManagementFactory.getThreadMXBean(), body)
 
 
 class DummyProfiler : Profiler {
     override fun getCounters(): Map<Any?, PerfCounters> = mapOf(null to SimplePerfCounters())
-    override fun getTotalCounters(): PerfCounters =
-        SimplePerfCounters()
+    override fun getTotalCounters(): PerfCounters = SimplePerfCounters()
 
     override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R = body()
 }
@@ -145,20 +149,17 @@ abstract class TotalProfiler : Profiler {
 
 
 class WallTotalProfiler : TotalProfiler() {
-    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R =
-        withMeasureWallTime(total, body)
+    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R = withMeasureWallTime(total, body)
 }
 
 
 class WallAndThreadTotalProfiler : TotalProfiler() {
-    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R =
-        withMeasureWallAndThreadTimes(total, threadMXBean, body)
+    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R = withMeasureWallAndThreadTimes(total, threadMXBean, body)
 }
 
 
 class WallAndThreadAndMemoryTotalProfiler(val withGC: Boolean) : TotalProfiler() {
-    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R =
-        withMeasureWallAndThreadTimesAndMemory(total, withGC, threadMXBean, body)
+    override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R = withMeasureWallAndThreadTimesAndMemory(total, withGC, threadMXBean, body)
 }
 
 
@@ -169,13 +170,5 @@ class WallAndThreadByClassProfiler() : TotalProfiler() {
     override fun getCounters(): Map<Any?, PerfCounters> = counters
 
     override final inline fun <R> withMeasure(obj: Any?, body: () -> R): R =
-        withMeasureWallAndThreadTimes(
-            counters.getOrPut(
-                obj?.javaClass?.name,
-                {
-                    SimplePerfCountersWithTotal(
-                        total
-                    )
-                }), threadMXBean, body
-        )
+            withMeasureWallAndThreadTimes(counters.getOrPut(obj?.javaClass?.name, { SimplePerfCountersWithTotal(total) }), threadMXBean, body)
 }

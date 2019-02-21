@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.cli.common.repl.experimental.ReplCompiler
 import org.jetbrains.kotlin.daemon.client.impls.KotlinRemoteReplCompilerClientImpl
 import org.jetbrains.kotlin.daemon.common.CompileService
 import org.jetbrains.kotlin.daemon.common.CompileServiceAsync
-import org.jetbrains.kotlin.daemon.common.impls.SOCKET_ANY_FREE_PORT
+import org.jetbrains.kotlin.daemon.common.SOCKET_ANY_FREE_PORT
 import org.jetbrains.kotlin.daemon.common.toRMI
 import java.io.File
 import java.util.concurrent.locks.ReentrantReadWriteLock

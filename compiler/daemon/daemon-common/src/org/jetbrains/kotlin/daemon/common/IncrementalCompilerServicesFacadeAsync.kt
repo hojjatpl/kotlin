@@ -5,9 +5,5 @@
 
 package org.jetbrains.kotlin.daemon.common
 
-import org.jetbrains.kotlin.daemon.common.CompilerServicesFacadeBaseAsync
-import org.jetbrains.kotlin.daemon.common.impls.SimpleDirtyData
-import java.io.File
-
 
 interface IncrementalCompilerServicesFacadeAsync : CompilerServicesFacadeBaseAsync

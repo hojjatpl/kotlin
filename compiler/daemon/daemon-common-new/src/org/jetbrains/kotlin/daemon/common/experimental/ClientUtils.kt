@@ -9,8 +9,8 @@ package org.jetbrains.kotlin.daemon.common.experimental
 import kotlinx.coroutines.*
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.runWithTimeout
-import org.jetbrains.kotlin.daemon.common.impls.DaemonReportCategory
-import org.jetbrains.kotlin.daemon.common.impls.makePortFromRunFilenameExtractor
+import org.jetbrains.kotlin.daemon.common.DaemonReportCategory
+import org.jetbrains.kotlin.daemon.common.makePortFromRunFilenameExtractor
 import java.io.File
 import java.rmi.registry.LocateRegistry
 import java.util.logging.Logger

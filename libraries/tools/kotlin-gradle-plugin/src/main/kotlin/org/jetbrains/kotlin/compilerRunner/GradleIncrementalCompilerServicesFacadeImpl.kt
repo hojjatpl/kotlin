@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.daemon.client.reportFromDaemon
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.gradle.logging.GradleBufferingMessageCollector
 import org.jetbrains.kotlin.gradle.logging.kotlinDebug
-import org.jetbrains.kotlin.daemon.common.impls.*
 import java.io.Serializable
 import java.rmi.Remote
 import java.rmi.server.UnicastRemoteObject
@@ -22,7 +21,7 @@ internal open class GradleCompilerServicesFacadeImpl(
     private val compilerMessageCollector: GradleBufferingMessageCollector,
     port: Int = SOCKET_ANY_FREE_PORT
 ) : UnicastRemoteObject(port, LoopbackNetworkInterface.clientLoopbackSocketFactory, LoopbackNetworkInterface.serverLoopbackSocketFactory),
-    CompilerServicesFacadeBase,
+        CompilerServicesFacadeBase,
     Remote {
 
     override fun report(category: Int, severity: Int, message: String?, attachment: Serializable?) {
@@ -51,4 +50,4 @@ internal class GradleIncrementalCompilerServicesFacadeImpl(
     messageCollector: GradleBufferingMessageCollector,
     port: Int = SOCKET_ANY_FREE_PORT
 ) : GradleCompilerServicesFacadeImpl(log, messageCollector, port),
-    IncrementalCompilerServicesFacade
+        IncrementalCompilerServicesFacade

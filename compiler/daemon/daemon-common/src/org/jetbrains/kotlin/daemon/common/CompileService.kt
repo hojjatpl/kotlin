@@ -1,12 +1,22 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
+ * Copyright 2010-2015 JetBrains s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.jetbrains.kotlin.daemon.common
 
 import org.jetbrains.kotlin.cli.common.repl.*
-import org.jetbrains.kotlin.daemon.common.impls.*
 import java.io.File
 import java.io.Serializable
 import java.rmi.Remote
@@ -76,7 +86,7 @@ interface CompileService : Remote {
     @Throws(RemoteException::class)
     fun registerClient(aliveFlagPath: String?): CallResult<Nothing>
 
-    // TODO: consider adding another client alive checking mechanism, e.g. socket/socketPort
+    // TODO: consider adding another client alive checking mechanism, e.g. socket/port
 
     @Throws(RemoteException::class)
     fun getClients(): CallResult<List<String>>
@@ -98,42 +108,42 @@ interface CompileService : Remote {
     @Deprecated("The usages should be replaced with `compile` method", ReplaceWith("compile"))
     @Throws(RemoteException::class)
     fun remoteCompile(
-        sessionId: Int,
-        targetPlatform: TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        outputFormat: OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            outputFormat: OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CallResult<Int>
 
     @Deprecated("The usages should be replaced with `compile` method", ReplaceWith("compile"))
     @Throws(RemoteException::class)
     fun remoteIncrementalCompile(
-        sessionId: Int,
-        targetPlatform: TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        compilerOutputFormat: OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            compilerOutputFormat: OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CallResult<Int>
 
     @Throws(RemoteException::class)
     fun compile(
-        sessionId: Int,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        compilationResults: CompilationResults?
+            sessionId: Int,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            compilationResults: CompilationResults?
     ): CallResult<Int>
 
     @Throws(RemoteException::class)
     fun classesFqNamesByFiles(
-        sessionId: Int,
-        sourceFiles: Set<File>
+            sessionId: Int,
+            sourceFiles: Set<File>
     ): CallResult<Set<String>>
 
     @Throws(RemoteException::class)
@@ -142,18 +152,18 @@ interface CompileService : Remote {
     @Deprecated("The usages should be replaced with other `leaseReplSession` method", ReplaceWith("leaseReplSession"))
     @Throws(RemoteException::class)
     fun leaseReplSession(
-        aliveFlagPath: String?,
-        targetPlatform: TargetPlatform,
-        servicesFacade: CompilerCallbackServicesFacade,
-        templateClasspath: List<File>,
-        templateClassName: String,
-        scriptArgs: Array<out Any?>?,
-        scriptArgsTypes: Array<out Class<out Any>>?,
-        compilerMessagesOutputStream: RemoteOutputStream,
-        evalOutputStream: RemoteOutputStream?,
-        evalErrorStream: RemoteOutputStream?,
-        evalInputStream: RemoteInputStream?,
-        operationsTracer: RemoteOperationsTracer?
+            aliveFlagPath: String?,
+            targetPlatform: CompileService.TargetPlatform,
+            servicesFacade: CompilerCallbackServicesFacade,
+            templateClasspath: List<File>,
+            templateClassName: String,
+            scriptArgs: Array<out Any?>?,
+            scriptArgsTypes: Array<out Class<out Any>>?,
+            compilerMessagesOutputStream: RemoteOutputStream,
+            evalOutputStream: RemoteOutputStream?,
+            evalErrorStream: RemoteOutputStream?,
+            evalInputStream: RemoteInputStream?,
+            operationsTracer: RemoteOperationsTracer?
     ): CallResult<Int>
 
     @Throws(RemoteException::class)
@@ -184,12 +194,12 @@ interface CompileService : Remote {
 
     @Throws(RemoteException::class)
     fun leaseReplSession(
-        aliveFlagPath: String?,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        templateClasspath: List<File>,
-        templateClassName: String
+            aliveFlagPath: String?,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            templateClasspath: List<File>,
+            templateClassName: String
     ): CallResult<Int>
 
     @Throws(RemoteException::class)

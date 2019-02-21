@@ -1,11 +1,10 @@
 /*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.daemon.common.impls
+package org.jetbrains.kotlin.daemon.common
 
-import org.jetbrains.kotlin.daemon.common.*
 import java.io.File
 import java.rmi.registry.LocateRegistry
 import java.util.*
@@ -26,10 +25,10 @@ fun makeRunFilenameString(timestamp: String, digest: String, port: String, escap
 
 fun makePortFromRunFilenameExtractor(digest: String): (String) -> Int? {
     val regex = makeRunFilenameString(
-        timestamp = "[0-9TZ:\\.\\+-]+",
-        digest = digest,
-        port = "(\\d+)",
-        escapeSequence = "\\"
+            timestamp = "[0-9TZ:\\.\\+-]+",
+            digest = digest,
+            port = "(\\d+)",
+            escapeSequence = "\\"
     ).toRegex()
     return {
         regex.find(it)
@@ -70,18 +69,18 @@ fun walkDaemons(
             if (daemon == null) {
                 if (relativeAge - ORPHANED_RUN_FILE_AGE_THRESHOLD_MS <= 0) {
                     report(
-                        DaemonReportCategory.DEBUG,
-                        "found fresh runServer file '${file.absolutePath}' ($relativeAge ms old), but no daemon, ignoring it"
+                            DaemonReportCategory.DEBUG,
+                            "found fresh runServer file '${file.absolutePath}' ($relativeAge ms old), but no daemon, ignoring it"
                     )
                 } else {
                     report(
-                        DaemonReportCategory.DEBUG,
-                        "found seemingly orphaned runServer file '${file.absolutePath}' ($relativeAge ms old), deleting it"
+                            DaemonReportCategory.DEBUG,
+                            "found seemingly orphaned runServer file '${file.absolutePath}' ($relativeAge ms old), deleting it"
                     )
                     if (!file.delete()) {
                         report(
-                            DaemonReportCategory.INFO,
-                            "WARNING: unable to delete seemingly orphaned file '${file.absolutePath}', cleanup recommended"
+                                DaemonReportCategory.INFO,
+                                "WARNING: unable to delete seemingly orphaned file '${file.absolutePath}', cleanup recommended"
                         )
                     }
                 }
@@ -102,9 +101,9 @@ private inline fun tryConnectToDaemon(port: Int, report: (DaemonReportCategory, 
     try {
         log.info("acquiring registry")
         val registry = LocateRegistry.getRegistry(
-            LoopbackNetworkInterface.loopbackInetAddressName,
-            port,
-            LoopbackNetworkInterface.clientLoopbackSocketFactory
+                LoopbackNetworkInterface.loopbackInetAddressName,
+                port,
+                LoopbackNetworkInterface.clientLoopbackSocketFactory
         )
         log.info("registry = $registry")
         log.info("looking up for daemon...")

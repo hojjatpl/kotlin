@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.cli.common.repl.ReplCheckResult
 import org.jetbrains.kotlin.cli.common.repl.ReplCodeLine
 import org.jetbrains.kotlin.cli.common.repl.ReplCompileResult
 import org.jetbrains.kotlin.cli.common.repl.ReplEvalResult
-import org.jetbrains.kotlin.daemon.common.impls.*
 import java.io.File
 
 class CompileServiceClientRMIWrapper(
@@ -23,44 +22,44 @@ class CompileServiceClientRMIWrapper(
 
     // deprecated methods :
     override fun remoteCompile(
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        outputFormat: CompileService.OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            outputFormat: CompileService.OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun remoteIncrementalCompile(
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        compilerOutputFormat: CompileService.OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            compilerOutputFormat: CompileService.OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun leaseReplSession(
-        aliveFlagPath: String?,
-        targetPlatform: CompileService.TargetPlatform,
-        servicesFacade: CompilerCallbackServicesFacade,
-        templateClasspath: List<File>,
-        templateClassName: String,
-        scriptArgs: Array<out Any?>?,
-        scriptArgsTypes: Array<out Class<out Any>>?,
-        compilerMessagesOutputStream: RemoteOutputStream,
-        evalOutputStream: RemoteOutputStream?,
-        evalErrorStream: RemoteOutputStream?,
-        evalInputStream: RemoteInputStream?,
-        operationsTracer: RemoteOperationsTracer?
+            aliveFlagPath: String?,
+            targetPlatform: CompileService.TargetPlatform,
+            servicesFacade: CompilerCallbackServicesFacade,
+            templateClasspath: List<File>,
+            templateClassName: String,
+            scriptArgs: Array<out Any?>?,
+            scriptArgsTypes: Array<out Class<out Any>>?,
+            compilerMessagesOutputStream: RemoteOutputStream,
+            evalOutputStream: RemoteOutputStream?,
+            evalErrorStream: RemoteOutputStream?,
+            evalInputStream: RemoteInputStream?,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -87,11 +86,11 @@ class CompileServiceClientRMIWrapper(
 
     // normal methods:
     override fun compile(
-        sessionId: Int,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        compilationResults: CompilationResults?
+            sessionId: Int,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            compilationResults: CompilationResults?
     ) = runBlocking {
         asyncCompileService.compile(
             sessionId,
@@ -104,12 +103,12 @@ class CompileServiceClientRMIWrapper(
 
 
     override fun leaseReplSession(
-        aliveFlagPath: String?,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        templateClasspath: List<File>,
-        templateClassName: String
+            aliveFlagPath: String?,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            templateClasspath: List<File>,
+            templateClassName: String
     ) = runBlocking {
         asyncCompileService.leaseReplSession(
             aliveFlagPath,
@@ -197,4 +196,8 @@ class CompileServiceClientRMIWrapper(
     }
 
 }
-fun CompileServiceAsync.toRMI() = CompileServiceClientRMIWrapper(this)
+
+fun CompileServiceAsync.toRMI() = when (this) {
+    is CompileServiceAsyncWrapper -> this.rmiCompileService
+    else -> CompileServiceClientRMIWrapper(this)
+}

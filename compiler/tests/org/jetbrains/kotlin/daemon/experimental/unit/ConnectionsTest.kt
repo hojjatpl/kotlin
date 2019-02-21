@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.daemon.client.KotlinCompilerDaemonClient
 import org.jetbrains.kotlin.daemon.client.experimental.BasicCompilerServicesWithResultsFacadeServerServerSide
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.*
-import org.jetbrains.kotlin.daemon.common.impls.*
 import org.jetbrains.kotlin.daemon.experimental.CompileServiceServerSideImpl
 import org.jetbrains.kotlin.daemon.loggerCompatiblePath
 import org.jetbrains.kotlin.integration.KotlinIntegrationTestBase
@@ -84,9 +83,9 @@ class ConnectionsTest : KotlinIntegrationTestBase() {
         File(
             runFileDir,
             makeRunFilenameString(
-                timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
-                digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
-                port = port.toString()
+                    timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
+                    digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
+                    port = port.toString()
             )
         )
     }
@@ -119,11 +118,11 @@ class ConnectionsTest : KotlinIntegrationTestBase() {
 
     private fun getOldDaemonsOrRMIWrappers() = runBlocking {
         walkDaemons(
-            File(daemonOptions.runFilesPathOrDefault),
-            compilerId,
-            runFile,
-            filter = { _, _ -> true },
-            report = { _, msg -> log.info(msg) }
+                File(daemonOptions.runFilesPathOrDefault),
+                compilerId,
+                runFile,
+                filter = { _, _ -> true },
+                report = { _, msg -> log.info(msg) }
         ).toList()
     }
 
@@ -149,9 +148,9 @@ class ConnectionsTest : KotlinIntegrationTestBase() {
 
     private fun runOldServer() {
         val (registry, serverPort) = findPortAndCreateRegistry(
-            COMPILE_DAEMON_FIND_PORT_ATTEMPTS,
-            COMPILE_DAEMON_PORTS_RANGE_START,
-            COMPILE_DAEMON_PORTS_RANGE_END
+                COMPILE_DAEMON_FIND_PORT_ATTEMPTS,
+                COMPILE_DAEMON_PORTS_RANGE_START,
+                COMPILE_DAEMON_PORTS_RANGE_END
         )
         val compilerSelector = object : CompilerSelector {
             private val jvm by lazy { K2JVMCompiler() }
@@ -365,16 +364,16 @@ class ConnectionsTest : KotlinIntegrationTestBase() {
                                     jar
                                 ),
                                 CompilationOptions(
-                                    CompilerMode.NON_INCREMENTAL_COMPILER,
-                                    CompileService.TargetPlatform.JVM,
-                                    arrayOf(
-                                        ReportCategory.COMPILER_MESSAGE.code,
-                                        ReportCategory.DAEMON_MESSAGE.code,
-                                        ReportCategory.EXCEPTION.code,
-                                        ReportCategory.OUTPUT_MESSAGE.code
+                                        CompilerMode.NON_INCREMENTAL_COMPILER,
+                                        CompileService.TargetPlatform.JVM,
+                                        arrayOf(
+                                                ReportCategory.COMPILER_MESSAGE.code,
+                                                ReportCategory.DAEMON_MESSAGE.code,
+                                                ReportCategory.EXCEPTION.code,
+                                                ReportCategory.OUTPUT_MESSAGE.code
                                     ),
-                                    ReportSeverity.INFO.code,
-                                    emptyArray()
+                                        ReportSeverity.INFO.code,
+                                        emptyArray()
                                 ),
                                 servicesClient,
                                 compResultsClient

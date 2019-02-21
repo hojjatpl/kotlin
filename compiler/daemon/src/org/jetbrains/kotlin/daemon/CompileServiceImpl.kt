@@ -41,11 +41,10 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.metadata.K2MetadataCompiler
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.*
-import org.jetbrains.kotlin.daemon.common.impls.DummyProfiler
-import org.jetbrains.kotlin.daemon.common.impls.Profiler
-import org.jetbrains.kotlin.daemon.common.impls.WallAndThreadAndMemoryTotalProfiler
-import org.jetbrains.kotlin.daemon.common.impls.WallAndThreadTotalProfiler
+import org.jetbrains.kotlin.daemon.common.DummyProfiler
+import org.jetbrains.kotlin.daemon.common.Profiler
+import org.jetbrains.kotlin.daemon.common.WallAndThreadAndMemoryTotalProfiler
+import org.jetbrains.kotlin.daemon.common.WallAndThreadTotalProfiler
 import org.jetbrains.kotlin.daemon.report.CompileServicesFacadeMessageCollector
 import org.jetbrains.kotlin.daemon.report.DaemonMessageReporter
 import org.jetbrains.kotlin.daemon.report.DaemonMessageReporterPrintStreamAdapter
@@ -260,9 +259,9 @@ class CompileServiceImpl(
         runFile = File(
             runFileDir,
             makeRunFilenameString(
-                timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
-                digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
-                port = port.toString()
+                    timestamp = "%tFT%<tH-%<tM-%<tS.%<tLZ".format(Calendar.getInstance(TimeZone.getTimeZone("Z"))),
+                    digest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString(),
+                    port = port.toString()
             )
         )
         try {
@@ -348,14 +347,14 @@ class CompileServiceImpl(
     }
 
     override fun remoteCompile(
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        outputFormat: CompileService.OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            outputFormat: CompileService.OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> =
         doCompile(sessionId, args, compilerOutputStream, serviceOutputStream, operationsTracer) { printStream, eventManager, profiler ->
             when (outputFormat) {
@@ -373,14 +372,14 @@ class CompileServiceImpl(
         }
 
     override fun remoteIncrementalCompile(
-        sessionId: Int,
-        targetPlatform: CompileService.TargetPlatform,
-        args: Array<out String>,
-        servicesFacade: CompilerCallbackServicesFacade,
-        compilerOutputStream: RemoteOutputStream,
-        compilerOutputFormat: CompileService.OutputFormat,
-        serviceOutputStream: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?
+            sessionId: Int,
+            targetPlatform: CompileService.TargetPlatform,
+            args: Array<out String>,
+            servicesFacade: CompilerCallbackServicesFacade,
+            compilerOutputStream: RemoteOutputStream,
+            compilerOutputFormat: CompileService.OutputFormat,
+            serviceOutputStream: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> =
         doCompile(sessionId, args, compilerOutputStream, serviceOutputStream, operationsTracer) { printStream, eventManager, profiler ->
             when (compilerOutputFormat) {
@@ -407,11 +406,11 @@ class CompileServiceImpl(
         }
 
     override fun compile(
-        sessionId: Int,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        compilationResults: CompilationResults?
+            sessionId: Int,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            compilationResults: CompilationResults?
     ): CompileService.CallResult<Int> = ifAlive {
         withValidClientOrSessionProxy(sessionId) {
             val messageCollector = CompileServicesFacadeMessageCollector(servicesFacade, compilationOptions)
@@ -490,11 +489,11 @@ class CompileServiceImpl(
     }
 
     private fun execJsIncrementalCompiler(
-        args: K2JSCompilerArguments,
-        incrementalCompilationOptions: IncrementalCompilationOptions,
-        servicesFacade: IncrementalCompilerServicesFacade,
-        compilationResults: CompilationResults,
-        compilerMessageCollector: MessageCollector
+            args: K2JSCompilerArguments,
+            incrementalCompilationOptions: IncrementalCompilationOptions,
+            servicesFacade: IncrementalCompilerServicesFacade,
+            compilationResults: CompilationResults,
+            compilerMessageCollector: MessageCollector
     ): ExitCode {
         val allKotlinFiles = arrayListOf<File>()
         val freeArgsWithoutKotlinFiles = arrayListOf<String>()
@@ -527,12 +526,12 @@ class CompileServiceImpl(
     }
 
     private fun execIncrementalCompiler(
-        k2jvmArgs: K2JVMCompilerArguments,
-        incrementalCompilationOptions: IncrementalCompilationOptions,
-        servicesFacade: IncrementalCompilerServicesFacade,
-        compilationResults: CompilationResults,
-        compilerMessageCollector: MessageCollector,
-        daemonMessageReporter: DaemonMessageReporter
+            k2jvmArgs: K2JVMCompilerArguments,
+            incrementalCompilationOptions: IncrementalCompilationOptions,
+            servicesFacade: IncrementalCompilerServicesFacade,
+            compilationResults: CompilationResults,
+            compilerMessageCollector: MessageCollector,
+            daemonMessageReporter: DaemonMessageReporter
     ): ExitCode {
         val reporter = RemoteICReporter(servicesFacade, compilationResults, incrementalCompilationOptions)
 
@@ -597,18 +596,18 @@ class CompileServiceImpl(
     }
 
     override fun leaseReplSession(
-        aliveFlagPath: String?,
-        targetPlatform: CompileService.TargetPlatform,
-        servicesFacade: CompilerCallbackServicesFacade,
-        templateClasspath: List<File>,
-        templateClassName: String,
-        scriptArgs: Array<out Any?>?,
-        scriptArgsTypes: Array<out Class<out Any>>?,
-        compilerMessagesOutputStream: RemoteOutputStream,
-        evalOutputStream: RemoteOutputStream?,
-        evalErrorStream: RemoteOutputStream?,
-        evalInputStream: RemoteInputStream?,
-        operationsTracer: RemoteOperationsTracer?
+            aliveFlagPath: String?,
+            targetPlatform: CompileService.TargetPlatform,
+            servicesFacade: CompilerCallbackServicesFacade,
+            templateClasspath: List<File>,
+            templateClassName: String,
+            scriptArgs: Array<out Any?>?,
+            scriptArgsTypes: Array<out Class<out Any>>?,
+            compilerMessagesOutputStream: RemoteOutputStream,
+            evalOutputStream: RemoteOutputStream?,
+            evalErrorStream: RemoteOutputStream?,
+            evalInputStream: RemoteInputStream?,
+            operationsTracer: RemoteOperationsTracer?
     ): CompileService.CallResult<Int> = ifAlive(minAliveness = Aliveness.Alive) {
         if (targetPlatform != CompileService.TargetPlatform.JVM)
             CompileService.CallResult.Error("Sorry, only JVM target platform is supported now")
@@ -616,8 +615,8 @@ class CompileServiceImpl(
             val disposable = Disposer.newDisposable()
             val compilerMessagesStream = PrintStream(
                 BufferedOutputStream(
-                    RemoteOutputStreamClient(compilerMessagesOutputStream, DummyProfiler()),
-                    REMOTE_STREAM_BUFFER_SIZE
+                        RemoteOutputStreamClient(compilerMessagesOutputStream, DummyProfiler()),
+                        REMOTE_STREAM_BUFFER_SIZE
                 )
             )
             val messageCollector = KeepFirstErrorMessageCollector(compilerMessagesStream)
@@ -662,12 +661,12 @@ class CompileServiceImpl(
         }
 
     override fun leaseReplSession(
-        aliveFlagPath: String?,
-        compilerArguments: Array<out String>,
-        compilationOptions: CompilationOptions,
-        servicesFacade: CompilerServicesFacadeBase,
-        templateClasspath: List<File>,
-        templateClassName: String
+            aliveFlagPath: String?,
+            compilerArguments: Array<out String>,
+            compilationOptions: CompilationOptions,
+            servicesFacade: CompilerServicesFacadeBase,
+            templateClasspath: List<File>,
+            templateClassName: String
     ): CompileService.CallResult<Int> = ifAlive(minAliveness = Aliveness.Alive) {
         if (compilationOptions.targetPlatform != CompileService.TargetPlatform.JVM)
             CompileService.CallResult.Error("Sorry, only JVM target platform is supported now")
@@ -735,10 +734,10 @@ class CompileServiceImpl(
         }
 
         val stub = UnicastRemoteObject.exportObject(
-            this,
-            port,
-            LoopbackNetworkInterface.clientLoopbackSocketFactory,
-            LoopbackNetworkInterface.serverLoopbackSocketFactory
+                this,
+                port,
+                LoopbackNetworkInterface.clientLoopbackSocketFactory,
+                LoopbackNetworkInterface.serverLoopbackSocketFactory
         ) as CompileService
         registry.rebind(COMPILER_SERVICE_RMI_NAME, stub)
 
@@ -827,11 +826,11 @@ class CompileServiceImpl(
 
             log.info("initiate elections")
             val aliveWithOpts = walkDaemons(
-                File(daemonOptions.runFilesPathOrDefault),
-                compilerId,
-                runFile,
-                filter = { _, p -> p != port },
-                report = { _, msg -> log.info(msg) }).toList()
+                    File(daemonOptions.runFilesPathOrDefault),
+                    compilerId,
+                    runFile,
+                    filter = { _, p -> p != port },
+                    report = { _, msg -> log.info(msg) }).toList()
             val comparator =
                 compareByDescending<DaemonWithMetadata, DaemonJVMOptions>(DaemonJVMOptionsMemoryComparator(), { it.jvmOptions })
                     .thenBy(FileAgeComparator()) { it.runFile }
@@ -961,12 +960,12 @@ class CompileServiceImpl(
 
     // todo: remove after remoteIncrementalCompile is removed
     private fun doCompile(
-        sessionId: Int,
-        args: Array<out String>,
-        compilerMessagesStreamProxy: RemoteOutputStream,
-        serviceOutputStreamProxy: RemoteOutputStream,
-        operationsTracer: RemoteOperationsTracer?,
-        body: (PrintStream, EventManager, Profiler) -> ExitCode
+            sessionId: Int,
+            args: Array<out String>,
+            compilerMessagesStreamProxy: RemoteOutputStream,
+            serviceOutputStreamProxy: RemoteOutputStream,
+            operationsTracer: RemoteOperationsTracer?,
+            body: (PrintStream, EventManager, Profiler) -> ExitCode
     ): CompileService.CallResult<Int> =
         ifAlive {
             withValidClientOrSessionProxy(sessionId) {
@@ -1004,10 +1003,10 @@ class CompileServiceImpl(
         }
 
     private fun doCompile(
-        sessionId: Int,
-        daemonMessageReporter: DaemonMessageReporter,
-        tracer: RemoteOperationsTracer?,
-        body: (EventManager, Profiler) -> ExitCode
+            sessionId: Int,
+            daemonMessageReporter: DaemonMessageReporter,
+            tracer: RemoteOperationsTracer?,
+            body: (EventManager, Profiler) -> ExitCode
     ): CompileService.CallResult<Int> =
         ifAlive {
             withValidClientOrSessionProxy(sessionId) {

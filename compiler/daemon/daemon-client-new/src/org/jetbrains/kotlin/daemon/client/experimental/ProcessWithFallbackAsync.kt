@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.daemon.client.experimental
 
 import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
 import org.jetbrains.kotlin.daemon.client.NativePlatformLauncherWrapper
-import org.jetbrains.kotlin.daemon.common.impls.DaemonReportCategory
+import org.jetbrains.kotlin.daemon.common.DaemonReportCategory
 import java.io.IOException
 
 suspend fun launchProcessWithFallback(

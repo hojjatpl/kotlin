@@ -32,8 +32,8 @@ import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
 import org.jetbrains.kotlin.daemon.client.KotlinCompilerDaemonClient
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
-import org.jetbrains.kotlin.daemon.common.impls.threadCpuTime
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.threadCpuTime
 import org.jetbrains.kotlin.script.StandardScriptDefinition
 import org.jetbrains.kotlin.script.tryConstructClassFromStringArgs
 import org.jetbrains.kotlin.test.ConfigurationKind

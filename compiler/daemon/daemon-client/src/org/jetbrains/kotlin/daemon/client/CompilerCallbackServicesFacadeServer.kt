@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.daemon.client
 
-import org.jetbrains.kotlin.daemon.common.impls.*
+import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.LookupInfo
 import org.jetbrains.kotlin.incremental.components.LookupTracker
@@ -31,9 +31,9 @@ open class CompilerCallbackServicesFacadeServer(
     port: Int = SOCKET_ANY_FREE_PORT
 ) : CompilerCallbackServicesFacade,
     UnicastRemoteObject(
-        port,
-        LoopbackNetworkInterface.clientLoopbackSocketFactory,
-        LoopbackNetworkInterface.serverLoopbackSocketFactory
+            port,
+            LoopbackNetworkInterface.clientLoopbackSocketFactory,
+            LoopbackNetworkInterface.serverLoopbackSocketFactory
     ) {
     override fun hasIncrementalCaches(): Boolean = incrementalCompilationComponents != null
 

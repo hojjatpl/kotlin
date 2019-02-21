@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.daemon.common
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.daemon.common.impls.CompilerServicesFacadeBase
 import java.io.Serializable
 
 class CompilerServicesFacadeBaseRMIWrapper(val clientSide: CompilerServicesFacadeBaseAsync) : CompilerServicesFacadeBase, Serializable {

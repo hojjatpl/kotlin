@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.cli.common.repl.ReplCompileResult
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.*
 import org.jetbrains.kotlin.daemon.common.CompileService
-import org.jetbrains.kotlin.daemon.common.impls.CompilerServicesFacadeBase
+import org.jetbrains.kotlin.daemon.common.CompilerServicesFacadeBase
 import java.io.File
 import java.util.logging.Logger
 

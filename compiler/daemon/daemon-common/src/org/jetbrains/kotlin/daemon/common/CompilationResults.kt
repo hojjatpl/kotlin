@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.jetbrains.kotlin.daemon.common.impls
+package org.jetbrains.kotlin.daemon.common
 
+import java.io.Serializable
 import java.rmi.Remote
 import java.rmi.RemoteException
 
-interface RemoteOutputStream : Remote {
-
+interface CompilationResults : Remote {
     @Throws(RemoteException::class)
-    fun close()
+    fun add(compilationResultCategory: Int, value: Serializable)
+}
 
-    @Throws(RemoteException::class)
-    fun write(data: ByteArray, offset: Int, length: Int)
-
-    @Throws(RemoteException::class)
-    fun write(dataByte: Int)
+enum class CompilationResultCategory(val code: Int) {
+    IC_COMPILE_ITERATION(0)
 }

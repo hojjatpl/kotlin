@@ -10,9 +10,9 @@ import org.jetbrains.kotlin.cli.common.ExitCode
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.impls.CompilationResultCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportCategory
-import org.jetbrains.kotlin.daemon.common.impls.ReportSeverity
+import org.jetbrains.kotlin.daemon.common.CompilationResultCategory
+import org.jetbrains.kotlin.daemon.common.ReportCategory
+import org.jetbrains.kotlin.daemon.common.ReportSeverity
 import org.jetbrains.kotlin.gradle.logging.*
 import org.jetbrains.kotlin.gradle.tasks.throwGradleExceptionIfError
 import org.jetbrains.kotlin.gradle.utils.stackTraceAsString
@@ -245,19 +245,19 @@ internal class GradleKotlinCompilerWork @Inject constructor(
         val knownChangedFiles = icEnv.changedFiles as? ChangedFiles.Known
 
         val compilationOptions = IncrementalCompilationOptions(
-            areFileChangesKnown = knownChangedFiles != null,
-            modifiedFiles = knownChangedFiles?.modified,
-            deletedFiles = knownChangedFiles?.removed,
-            workingDir = icEnv.workingDir,
-            reportCategories = reportCategories(isVerbose),
-            reportSeverity = reportSeverity(isVerbose),
-            requestedCompilationResults = arrayOf(CompilationResultCategory.IC_COMPILE_ITERATION.code),
-            compilerMode = CompilerMode.INCREMENTAL_COMPILER,
-            targetPlatform = targetPlatform,
-            usePreciseJavaTracking = icEnv.usePreciseJavaTracking,
-            outputFiles = outputFiles,
-            multiModuleICSettings = icEnv.multiModuleICSettings,
-            modulesInfo = incrementalModuleInfo!!
+                areFileChangesKnown = knownChangedFiles != null,
+                modifiedFiles = knownChangedFiles?.modified,
+                deletedFiles = knownChangedFiles?.removed,
+                workingDir = icEnv.workingDir,
+                reportCategories = reportCategories(isVerbose),
+                reportSeverity = reportSeverity(isVerbose),
+                requestedCompilationResults = arrayOf(CompilationResultCategory.IC_COMPILE_ITERATION.code),
+                compilerMode = CompilerMode.INCREMENTAL_COMPILER,
+                targetPlatform = targetPlatform,
+                usePreciseJavaTracking = icEnv.usePreciseJavaTracking,
+                outputFiles = outputFiles,
+                multiModuleICSettings = icEnv.multiModuleICSettings,
+                modulesInfo = incrementalModuleInfo!!
         )
 
         log.info("Options for KOTLIN DAEMON: $compilationOptions")
