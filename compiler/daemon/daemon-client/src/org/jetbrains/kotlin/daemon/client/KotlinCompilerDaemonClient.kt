@@ -16,6 +16,7 @@ import java.io.File
 data class CompileServiceSessionAsync(val compileService: CompileServiceAsync, val sessionId: Int)
 
 fun CompileServiceSession.toAsync() = CompileServiceSessionAsync(this.compileService.toClient(), this.sessionId)
+fun CompileServiceSessionAsync.toRMI() = CompileServiceSession(this.compileService.toRMI(), this.sessionId)
 
 interface KotlinCompilerDaemonClient {
     suspend fun connectToCompileService(

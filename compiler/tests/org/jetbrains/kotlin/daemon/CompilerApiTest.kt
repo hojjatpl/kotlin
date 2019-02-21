@@ -25,9 +25,8 @@ import org.jetbrains.kotlin.cli.common.messages.OutputMessageUtil
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.daemon.client.DaemonReportingTargets
-import org.jetbrains.kotlin.daemon.client.impls.KotlinCompilerClientImpl
+import org.jetbrains.kotlin.daemon.client.KotlinCompilerClient
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.common.ReportSeverity
 import org.jetbrains.kotlin.integration.KotlinIntegrationTestBase
 import org.jetbrains.kotlin.scripts.captureOut
 import org.jetbrains.kotlin.test.KotlinTestUtils
@@ -64,15 +63,15 @@ class CompilerApiTest : KotlinIntegrationTestBase() {
 
     private fun compileOnDaemon(clientAliveFile: File, compilerId: CompilerId, daemonJVMOptions: DaemonJVMOptions, daemonOptions: DaemonOptions,
                                 messageCollector: MessageCollector, vararg args: String): Pair<Int, Collection<OutputMessageUtil.Output>> {
-        val daemon = KotlinCompilerClientImpl.connectToCompileService(compilerId, clientAliveFile, daemonJVMOptions, daemonOptions,
-                                                                           DaemonReportingTargets(messageCollector = messageCollector), autostart = true)
+        val daemon = KotlinCompilerClient.connectToCompileService(compilerId, clientAliveFile, daemonJVMOptions, daemonOptions,
+                                                                  DaemonReportingTargets(messageCollector = messageCollector), autostart = true)
         assertNotNull("failed to connect daemon", daemon)
 
         daemon?.registerClient(clientAliveFile.absolutePath)
 
         val outputs = arrayListOf<OutputMessageUtil.Output>()
 
-        val code = KotlinCompilerClientImpl.compile(daemon!!, CompileService.NO_SESSION, CompileService.TargetPlatform.JVM, args, messageCollector,
+        val code = KotlinCompilerClient.compile(daemon!!, CompileService.NO_SESSION, CompileService.TargetPlatform.JVM, args, messageCollector,
                                                 { outFile, srcFiles -> outputs.add(OutputMessageUtil.Output(srcFiles, outFile)) },
                                                 reportSeverity = ReportSeverity.DEBUG)
         return code to outputs
@@ -132,7 +131,7 @@ class CompilerApiTest : KotlinIntegrationTestBase() {
                 run(getHelloAppBaseDir(), "hello.run", "-cp", jar, "Hello.HelloKt")
             }
             finally {
-                KotlinCompilerClientImpl.shutdownCompileService(compilerId, daemonOptions)
+                KotlinCompilerClient.shutdownCompileService(compilerId, daemonOptions)
                 logFile.delete()
             }
         }
@@ -169,7 +168,7 @@ class CompilerApiTest : KotlinIntegrationTestBase() {
                 runScriptWithArgs(getSimpleScriptBaseDir(), "script", "Script", listOf(tmpdir), "hi", "there")
             }
             finally {
-                KotlinCompilerClientImpl.shutdownCompileService(compilerId, daemonOptions)
+                KotlinCompilerClient.shutdownCompileService(compilerId, daemonOptions)
                 logFile.delete()
             }
         }
@@ -199,7 +198,6 @@ class TestMessageCollector : MessageCollector {
 fun TestMessageCollector.assertHasMessage(msg: String, desiredSeverity: CompilerMessageSeverity? = null) {
     assert(messages.any { it.message.contains(msg) && (desiredSeverity == null || it.severity == desiredSeverity) }) {
         "Expecting message \"$msg\" with severity ${desiredSeverity?.toString() ?: "Any"}, actual:\n" +
-        messages.joinToString("\n") { it.severity.toString() + ": " + it.message }
+                messages.joinToString("\n") { it.severity.toString() + ": " + it.message }
     }
 }
-

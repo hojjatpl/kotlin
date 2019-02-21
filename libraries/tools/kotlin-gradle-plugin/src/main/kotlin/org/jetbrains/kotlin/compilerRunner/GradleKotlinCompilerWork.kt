@@ -184,7 +184,7 @@ internal class GradleKotlinCompilerWork @Inject constructor(
         }
 
         val (daemonClient, sessionId) = connection
-        val daemon = daemonClient.toRMI()
+        val daemon = daemonClient
         val targetPlatform = when (compilerClassName) {
             KotlinCompilerClass.JVM -> CompileService.TargetPlatform.JVM
             KotlinCompilerClass.JS -> CompileService.TargetPlatform.JS

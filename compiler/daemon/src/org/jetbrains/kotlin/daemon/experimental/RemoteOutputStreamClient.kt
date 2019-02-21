@@ -6,12 +6,12 @@
 package org.jetbrains.kotlin.daemon.experimental
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.kotlin.daemon.common.DummyProfiler
-import org.jetbrains.kotlin.daemon.common.Profiler
 import org.jetbrains.kotlin.daemon.common.experimental.RemoteOutputStreamAsyncClientSide
+import org.jetbrains.kotlin.daemon.common.impls.DummyProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.ProfilerAsync
 import java.io.OutputStream
 
-class RemoteOutputStreamClient(val remote: RemoteOutputStreamAsyncClientSide, val profiler: Profiler = DummyProfiler()) : OutputStream() {
+class RemoteOutputStreamClient(val remote: RemoteOutputStreamAsyncClientSide, val profiler: ProfilerAsync = DummyProfilerAsync()) : OutputStream() {
     override fun write(data: ByteArray) = runBlocking {
         profiler.withMeasure(this) { remote.write(data, 0, data.size) }
     }

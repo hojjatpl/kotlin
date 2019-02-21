@@ -38,11 +38,11 @@ import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.daemon.LazyClasspathWatcher
 import org.jetbrains.kotlin.daemon.common.*
 import org.jetbrains.kotlin.daemon.common.experimental.*
-import org.jetbrains.kotlin.daemon.common.DummyProfiler
-import org.jetbrains.kotlin.daemon.common.Profiler
-import org.jetbrains.kotlin.daemon.common.WallAndThreadAndMemoryTotalProfiler
-import org.jetbrains.kotlin.daemon.common.WallAndThreadTotalProfiler
 import org.jetbrains.kotlin.daemon.common.experimental.socketInfrastructure.*
+import org.jetbrains.kotlin.daemon.common.impls.DummyProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.ProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.WallAndThreadAndMemoryTotalProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.WallAndThreadTotalProfilerAsync
 import org.jetbrains.kotlin.daemon.nowSeconds
 import org.jetbrains.kotlin.daemon.report.experimental.CompileServicesFacadeMessageCollector
 import org.jetbrains.kotlin.daemon.report.experimental.DaemonMessageReporterAsync
@@ -1038,12 +1038,12 @@ class CompileServiceServerSideImpl(
             sessionId: Int,
             daemonMessageReporterAsync: DaemonMessageReporterAsync,
             tracer: RemoteOperationsTracer?,
-            body: suspend (EventManager, Profiler) -> ExitCode
+            body: suspend (EventManager, ProfilerAsync) -> ExitCode
     ): Deferred<CompileService.CallResult<Int>> = GlobalScope.async {
         log.info("alive!")
         withValidClientOrSessionProxy(sessionId) {
             log.info("before compile")
-            val rpcProfiler = if (daemonOptions.reportPerf) WallAndThreadTotalProfiler() else DummyProfiler()
+            val rpcProfiler = if (daemonOptions.reportPerf) WallAndThreadTotalProfilerAsync() else DummyProfilerAsync()
             val eventManger = EventManagerImpl()
             try {
                 log.info("trying get exitCode")
@@ -1065,7 +1065,7 @@ class CompileServiceServerSideImpl(
     private fun createCompileServices(
         facade: CompilerCallbackServicesFacadeClientSide,
         eventManager: EventManager,
-        rpcProfiler: Profiler
+        rpcProfiler: ProfilerAsync
     ): Deferred<Services> = GlobalScope.async {
         val builder = Services.Builder()
         if (facade.hasIncrementalCaches()) {
@@ -1089,12 +1089,12 @@ class CompileServiceServerSideImpl(
 
     private fun <R> checkedCompile(
             daemonMessageReporterAsync: DaemonMessageReporterAsync,
-            rpcProfiler: Profiler,
+            rpcProfiler: ProfilerAsync,
             body: suspend () -> R
     ): Deferred<R> = GlobalScope.async {
         try {
             log.info("checkedCompile")
-            val profiler = if (daemonOptions.reportPerf) WallAndThreadAndMemoryTotalProfiler(withGC = false) else DummyProfiler()
+            val profiler = if (daemonOptions.reportPerf) WallAndThreadAndMemoryTotalProfilerAsync(withGC = false) else DummyProfilerAsync()
 
             val res = profiler.withMeasure(null, body)
 

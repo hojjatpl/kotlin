@@ -29,6 +29,9 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.daemon.common.DummyProfiler
 import org.jetbrains.kotlin.daemon.common.Profiler
 import org.jetbrains.kotlin.daemon.common.WallAndThreadAndMemoryTotalProfiler
+import org.jetbrains.kotlin.daemon.common.impls.DummyProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.ProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.WallAndThreadAndMemoryTotalProfilerAsync
 
 object KotlinCompilerRunnerUtils {
     fun exitCodeFromProcessExitCode(log: KotlinLogger, code: Int): ExitCode {
@@ -60,7 +63,7 @@ object KotlinCompilerRunnerUtils {
         val daemonReportMessages = ArrayList<DaemonReportMessage>()
         val daemonReportingTargets = DaemonReportingTargets(messages = daemonReportMessages)
 
-        val profiler = if (daemonOptions.reportPerf) WallAndThreadAndMemoryTotalProfiler(withGC = false) else DummyProfiler()
+        val profiler = if (daemonOptions.reportPerf) WallAndThreadAndMemoryTotalProfilerAsync(withGC = false) else DummyProfilerAsync()
 
         val kotlinCompilerClient = KotlinCompilerDaemonClient.instantiate(Version.RMI)
 
@@ -91,7 +94,7 @@ object KotlinCompilerRunnerUtils {
         }
 
         fun reportTotalAndThreadPerf(
-            message: String, daemonOptions: DaemonOptions, messageCollector: MessageCollector, profiler: Profiler
+            message: String, daemonOptions: DaemonOptions, messageCollector: MessageCollector, profiler: ProfilerAsync
         ) {
             if (daemonOptions.reportPerf) {
                 fun Long.ms() = TimeUnit.NANOSECONDS.toMillis(this)
@@ -103,7 +106,7 @@ object KotlinCompilerRunnerUtils {
         }
 
         reportTotalAndThreadPerf("Daemon connect", daemonOptions, MessageCollector.NONE, profiler)
-        return connection
+        return connection?.toRMI()
     }
 }
 

@@ -16,10 +16,10 @@
 
 package org.jetbrains.kotlin.daemon.experimental
 
-import org.jetbrains.kotlin.daemon.common.DummyProfiler
-import org.jetbrains.kotlin.daemon.common.Profiler
 import org.jetbrains.kotlin.daemon.common.RmiFriendlyCompilationCanceledException
 import org.jetbrains.kotlin.daemon.common.experimental.CompilerCallbackServicesFacadeClientSide
+import org.jetbrains.kotlin.daemon.common.impls.DummyProfilerAsync
+import org.jetbrains.kotlin.daemon.common.impls.ProfilerAsync
 import org.jetbrains.kotlin.progress.CompilationCanceledException
 import org.jetbrains.kotlin.progress.experimental.CompilationCanceledStatus
 import java.util.concurrent.TimeUnit
@@ -29,7 +29,7 @@ val CANCELED_STATUS_CHECK_THRESHOLD_NS = TimeUnit.MILLISECONDS.toNanos(100)
 
 class RemoteCompilationCanceledStatusClient(
     val facade: CompilerCallbackServicesFacadeClientSide,
-    val profiler: Profiler = DummyProfiler()
+    val profiler: ProfilerAsync = DummyProfilerAsync()
 ) : CompilationCanceledStatus {
 
     private val log by lazy { Logger.getLogger("RemoteCompilationCanceledStatusClient") }
