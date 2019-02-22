@@ -91,9 +91,11 @@ abstract class AbstractKotlinUVariable(givenParent: UElement?) : KotlinAbstractU
     }
 
 
-    abstract protected fun acceptsAnnotationTarget(target: AnnotationUseSiteTarget?): Boolean
+    protected abstract fun acceptsAnnotationTarget(target: AnnotationUseSiteTarget?): Boolean
 
-    override val typeReference by lz { getLanguagePlugin().convertOpt<UTypeReferenceExpression>(psi.typeElement, this) }
+    override val typeReference: UTypeReferenceExpression? by lz {
+        KotlinUTypeReferenceExpression(type, (sourcePsi as? KtCallableDeclaration)?.typeReference, this)
+    }
 
     override val uastAnchor: UIdentifier?
         get() {
@@ -156,8 +158,6 @@ class KotlinUVariable(
     override val javaPsi = unwrap<UVariable, PsiVariable>(psi)
 
     override val psi = javaPsi
-
-    override val typeReference by lz { getLanguagePlugin().convertOpt<UTypeReferenceExpression>(psi.typeElement, this) }
 
     override fun acceptsAnnotationTarget(target: AnnotationUseSiteTarget?): Boolean = true
 
