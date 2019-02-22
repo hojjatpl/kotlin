@@ -41,7 +41,10 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.metadata.K2MetadataCompiler
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.daemon.common.*
-import org.jetbrains.kotlin.daemon.report.*
+import org.jetbrains.kotlin.daemon.report.CompileServicesFacadeMessageCollector
+import org.jetbrains.kotlin.daemon.report.DaemonMessageReporter
+import org.jetbrains.kotlin.daemon.report.DaemonMessageReporterPrintStreamAdapter
+import org.jetbrains.kotlin.daemon.report.getICReporter
 import org.jetbrains.kotlin.incremental.*
 import org.jetbrains.kotlin.incremental.components.ExpectActualTracker
 import org.jetbrains.kotlin.incremental.components.LookupTracker
@@ -623,7 +626,7 @@ class CompileServiceImpl(
             )
             val messageCollector = KeepFirstErrorMessageCollector(compilerMessagesStream)
             val repl = KotlinJvmReplService(
-                disposable, port, templateClasspath, templateClassName,
+                disposable, port, compilerId, templateClasspath, templateClassName,
                 messageCollector, operationsTracer
             )
             val sessionId = state.sessions.leaseSession(ClientOrSessionProxy(aliveFlagPath, repl, disposable))
@@ -676,7 +679,7 @@ class CompileServiceImpl(
             val disposable = Disposer.newDisposable()
             val messageCollector = CompileServicesFacadeMessageCollector(servicesFacade, compilationOptions)
             val repl = KotlinJvmReplService(
-                disposable, port, templateClasspath, templateClassName,
+                disposable, port, compilerId, templateClasspath, templateClassName,
                 messageCollector, null
             )
             val sessionId = state.sessions.leaseSession(ClientOrSessionProxy(aliveFlagPath, repl, disposable))
