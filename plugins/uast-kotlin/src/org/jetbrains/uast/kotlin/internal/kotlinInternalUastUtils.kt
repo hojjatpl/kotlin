@@ -98,14 +98,12 @@ internal fun resolveSource(context: KtElement, descriptor: DeclarationDescriptor
     }
 }
 
-internal fun resolveDeserializedClass(context: KtElement, descriptor: DeclarationDescriptor): PsiClass? {
-    if (descriptor !is DeserializedCallableMemberDescriptor) return null
-
-    val containingDeclaration = descriptor.containingDeclaration
+internal fun resolveContainingDeserializedClass(context: KtElement, memberDescriptor: DeserializedCallableMemberDescriptor): PsiClass? {
+    val containingDeclaration = memberDescriptor.containingDeclaration
     return when (containingDeclaration) {
         is LazyJavaPackageFragment -> {
             val binaryPackageSourceElement = containingDeclaration.source as? KotlinJvmBinaryPackageSourceElement ?: return null
-            val containingBinaryClass = binaryPackageSourceElement.getContainingBinaryClass(descriptor) ?: return null
+            val containingBinaryClass = binaryPackageSourceElement.getContainingBinaryClass(memberDescriptor) ?: return null
             val containingClassQualifiedName = containingBinaryClass.classId.asSingleFqName().asString()
             JavaPsiFacade.getInstance(context.project).findClass(containingClassQualifiedName, context.resolveScope) ?: return null
         }
@@ -120,7 +118,7 @@ internal fun resolveDeserializedClass(context: KtElement, descriptor: Declaratio
 private fun resolveDeserialized(context: KtElement, descriptor: DeclarationDescriptor): PsiMethod? {
     if (descriptor !is DeserializedCallableMemberDescriptor) return null
 
-    val psiClass = resolveDeserializedClass(context, descriptor) ?: return null
+    val psiClass = resolveContainingDeserializedClass(context, descriptor) ?: return null
 
     val proto = descriptor.proto
     val nameResolver = descriptor.nameResolver

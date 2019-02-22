@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getAssignmentByLHS
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelectorOrThis
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedCallableMemberDescriptor
 import org.jetbrains.kotlin.synthetic.SyntheticJavaPropertyDescriptor
 import org.jetbrains.kotlin.utils.addToStdlib.constant
 import org.jetbrains.uast.*
@@ -209,7 +210,7 @@ class KotlinClassViaConstructorUSimpleReferenceExpression(
         when (val resultingDescriptor = psi.getResolvedCall(psi.analyze())?.resultingDescriptor) {
             is ConstructorDescriptor -> {
                 resultingDescriptor.constructedClass.toSource()?.getMaybeLightElement(this)
-                    ?: resolveDeserializedClass(psi, resultingDescriptor)
+                    ?: (resultingDescriptor as? DeserializedCallableMemberDescriptor)?.let { resolveContainingDeserializedClass(psi, it) }
             }
             is SamConstructorDescriptor ->
                 (resultingDescriptor.returnType?.getFunctionalInterfaceType(this, psi) as? PsiClassType)?.resolve()
