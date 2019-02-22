@@ -15,7 +15,6 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.idea.core.script.settings.KotlinScriptingSettings
 import org.jetbrains.kotlin.script.KotlinScriptDefinition
-import org.jetbrains.kotlin.script.LegacyResolverWrapper
 import org.jetbrains.kotlin.script.asResolveFailure
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.findScriptDefinition
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -64,7 +63,7 @@ class AsyncScriptDependenciesLoader internal constructor(project: Project) : Scr
         return if (dependenciesResolver is AsyncDependenciesResolver) {
             dependenciesResolver.resolveAsync(scriptContents, environment)
         } else {
-            assert(dependenciesResolver is LegacyResolverWrapper)
+            // TODO: shouldn't come here after dropping legacy resolvers, refactor accordingly
             dependenciesResolver.resolve(scriptContents, environment)
         }
     }

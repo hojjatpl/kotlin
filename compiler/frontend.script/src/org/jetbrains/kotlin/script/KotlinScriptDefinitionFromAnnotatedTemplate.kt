@@ -54,18 +54,7 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
 
     override val dependencyResolver: DependenciesResolver by lazy(LazyThreadSafetyMode.PUBLICATION) {
         resolverFromAnnotation(template) ?:
-        resolverFromLegacyAnnotation(template) ?:
         DependenciesResolver.NoDependencies
-    }
-
-    private fun resolverFromLegacyAnnotation(template: KClass<out Any>): DependenciesResolver? {
-        val legacyDefAnn = takeUnlessError {
-            template.annotations.firstIsInstanceOrNull<ScriptTemplateDefinition>()
-        } ?: return null
-
-        log.warn("[kts] Deprecated annotations on the script template are used, please update the provider")
-
-        return instantiateResolver(legacyDefAnn.resolver)?.let(::LegacyPackageDependencyResolverWrapper)
     }
 
     private fun resolverFromAnnotation(template: KClass<out Any>): DependenciesResolver? {
@@ -77,7 +66,7 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
         return when (resolver) {
             is AsyncDependenciesResolver -> AsyncDependencyResolverWrapper(resolver)
             is DependenciesResolver -> resolver
-            else -> resolver?.let(::ApiChangeDependencyResolverWrapper)
+            else -> throw IllegalStateException("Unsupported script dependencies resolver: $resolver")
         }
     }
 
@@ -101,7 +90,6 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
 
     private val samWithReceiverAnnotations: List<String>? by lazy(LazyThreadSafetyMode.PUBLICATION) {
         takeUnlessError { template.annotations.firstIsInstanceOrNull<kotlin.script.extensions.SamWithReceiverAnnotations>()?.annotations?.toList() }
-        ?: takeUnlessError { template.annotations.firstIsInstanceOrNull<org.jetbrains.kotlin.script.SamWithReceiverAnnotations>()?.annotations?.toList() }
     }
 
     override val acceptedAnnotations: List<KClass<out Annotation>> by lazy(LazyThreadSafetyMode.PUBLICATION) {

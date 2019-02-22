@@ -39,10 +39,8 @@ import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.NotNullableUserDataProperty
 import org.jetbrains.kotlin.script.KotlinScriptDefinition
-import org.jetbrains.kotlin.script.LegacyResolverWrapper
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.findScriptDefinition
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.scriptDefinition
-import kotlin.script.experimental.dependencies.AsyncDependenciesResolver
 import kotlin.script.experimental.dependencies.ScriptDependencies
 
 class ScriptDependenciesUpdater(
@@ -73,11 +71,7 @@ class ScriptDependenciesUpdater(
     }
 
     private fun updateDependencies(file: VirtualFile, scriptDef: KotlinScriptDefinition) {
-        val loader = when (scriptDef.dependencyResolver) {
-            is AsyncDependenciesResolver, is LegacyResolverWrapper -> asyncLoader
-            else -> syncLoader
-        }
-        loader.updateDependencies(file, scriptDef)
+        syncLoader.updateDependencies(file, scriptDef)
     }
 
     private fun listenForChangesInScripts() {
