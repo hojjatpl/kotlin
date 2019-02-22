@@ -28,7 +28,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
-import org.jetbrains.kotlin.resolve.lazy.data.KtClassLikeInfo
+import org.jetbrains.kotlin.resolve.lazy.data.KtClassOrObjectInfo
+import org.jetbrains.kotlin.resolve.lazy.data.KtScriptInfo
 import org.jetbrains.kotlin.resolve.lazy.declarations.PackageMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyPackageDescriptor
 import org.jetbrains.kotlin.resolve.scopes.ChainedMemberScope
@@ -232,12 +233,13 @@ private class EvaluatorModuleDescriptor(
 
         override fun getDeclarationNames() = emptySet<Name>()
         override fun getDeclarations(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean) = emptyList<KtDeclaration>()
-        override fun getClassOrObjectDeclarations(name: Name) = emptyList<KtClassLikeInfo>()
+        override fun getClassOrObjectDeclarations(name: Name) = emptyList<KtClassOrObjectInfo<*>>()
         override fun getAllDeclaredSubPackages(nameFilter: (Name) -> Boolean) = emptyList<FqName>()
         override fun getFunctionDeclarations(name: Name) = emptyList<KtNamedFunction>()
         override fun getPropertyDeclarations(name: Name) = emptyList<KtProperty>()
         override fun getTypeAliasDeclarations(name: Name) = emptyList<KtTypeAlias>()
         override fun getDestructuringDeclarationsEntries(name: Name) = emptyList<KtDestructuringDeclarationEntry>()
+        override fun getScriptDeclarations(name: Name) = emptyList<KtScriptInfo>()
     }
 
     val packageFragmentForEvaluator = LazyPackageDescriptor(this, FqName.ROOT, resolveSession, declarationProvider)
