@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.utils.getSafe
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.reflect.Modifier
 
 abstract class AbstractAsyncStackTraceTest : KotlinDebuggerTestBase() {
     private companion object {
@@ -92,7 +93,8 @@ abstract class AbstractAsyncStackTraceTest : KotlinDebuggerTestBase() {
             append(MARGIN).appendln(item.toString())
 
             @Suppress("UNCHECKED_CAST")
-            val variables = item.javaClass.getDeclaredField("myVariables").getSafe(item) as? List<JavaValue>
+            val variablesField = item.javaClass.declaredFields.first { !Modifier.isStatic(it.modifiers) && it.type == List::class.java }
+            val variables = variablesField.getSafe(item) as? List<JavaValue>
             if (variables != null) {
                 for (variable in variables) {
                     val descriptor = variable.descriptor
