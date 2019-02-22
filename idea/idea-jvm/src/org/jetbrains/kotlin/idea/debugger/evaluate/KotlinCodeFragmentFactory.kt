@@ -294,7 +294,7 @@ class KotlinCodeFragmentFactory : CodeFragmentFactory() {
 
         private const val DEBUG_LABEL_SUFFIX: String = "_DebugLabel"
 
-        @TestOnly
+        @get:TestOnly
         val DEBUG_CONTEXT_FOR_TESTS: Key<DebuggerContextImpl> = Key.create("DEBUG_CONTEXT_FOR_TESTS")
 
         fun getContextElement(elementAt: PsiElement?): PsiElement? {
