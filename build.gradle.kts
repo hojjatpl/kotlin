@@ -1,11 +1,25 @@
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.gradle.api.file.FileCollection
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import proguard.gradle.ProGuardTask
-import org.gradle.kotlin.dsl.*
+import kotlin.collections.Collection
+import kotlin.collections.List
+import kotlin.collections.filter
+import kotlin.collections.find
+import kotlin.collections.forEach
+import kotlin.collections.hashSetOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
+import kotlin.collections.listOf
+import kotlin.collections.listOfNotNull
+import kotlin.collections.map
+import kotlin.collections.minus
+import kotlin.collections.plus
+import kotlin.collections.sortedBy
+import kotlin.collections.toList
+import kotlin.collections.toSet
 
 buildscript {
     extra["defaultSnapshotVersion"] = "1.3-SNAPSHOT"
@@ -197,7 +211,6 @@ extra["compilerModules"] = arrayOf(
         ":compiler:frontend",
         ":compiler:frontend.common",
         ":compiler:frontend.java",
-        ":compiler:frontend.script",
         ":compiler:cli-common",
         ":compiler:daemon-common",
         ":compiler:daemon",
