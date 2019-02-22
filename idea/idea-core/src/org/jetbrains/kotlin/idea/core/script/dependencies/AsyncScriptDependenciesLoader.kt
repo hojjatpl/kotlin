@@ -14,9 +14,9 @@ import com.intellij.openapi.vfs.VirtualFile
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.idea.core.script.settings.KotlinScriptingSettings
-import org.jetbrains.kotlin.script.KotlinScriptDefinition
-import org.jetbrains.kotlin.script.asResolveFailure
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.findScriptDefinition
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.asResolveFailure
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.write

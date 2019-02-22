@@ -17,12 +17,8 @@ import org.jetbrains.kotlin.extensions.CompilerConfigurationExtension
 import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
-import org.jetbrains.kotlin.script.ScriptDefinitionProvider
-import org.jetbrains.kotlin.script.ScriptDependenciesProvider
-import org.jetbrains.kotlin.script.ScriptReportSink
-import org.jetbrains.kotlin.scripting.legacy.CliScriptDefinitionProvider
-import org.jetbrains.kotlin.scripting.legacy.CliScriptDependenciesProvider
-import org.jetbrains.kotlin.scripting.legacy.CliScriptReportSink
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.ScriptReportSink
+import org.jetbrains.kotlin.scripting.legacy.*
 
 private fun <T> ProjectExtensionDescriptor<T>.registerExtensionIfRequired(project: MockProject, extension: T) {
     try {

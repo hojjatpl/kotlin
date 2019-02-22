@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlin.idea.core.script
 
-import org.jetbrains.kotlin.script.KotlinScriptDefinition
 import org.jetbrains.kotlin.script.ScriptTemplatesProvider
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
 
 class ScriptTemplatesProviderAdapter(private val templatesProvider: ScriptTemplatesProvider) :
     ScriptDefinitionContributor {

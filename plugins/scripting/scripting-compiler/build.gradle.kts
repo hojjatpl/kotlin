@@ -16,6 +16,7 @@ dependencies {
     compile(project(":kotlin-scripting-jvm"))
     compile(kotlinStdlib())
     compileOnly(project(":kotlin-reflect-api"))
+    compile(commonDep("org.jetbrains.kotlinx", "kotlinx-coroutines-core")) { isTransitive = false }
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly(intellijDep()) { includeJars("asm-all", rootProject = rootProject) }
 
@@ -37,8 +38,8 @@ sourceSets {
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>> {
     kotlinOptions {
-        languageVersion = "1.2"
-        apiVersion = "1.2"
+        languageVersion = "1.3"
+        apiVersion = "1.3"
         freeCompilerArgs += "-Xskip-metadata-version-check"
     }
 }

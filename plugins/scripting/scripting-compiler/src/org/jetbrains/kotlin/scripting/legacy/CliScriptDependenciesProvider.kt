@@ -20,11 +20,10 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import org.jetbrains.kotlin.script.ScriptContentLoader
-import org.jetbrains.kotlin.script.ScriptDependenciesProvider
-import org.jetbrains.kotlin.script.ScriptReportSink
-import org.jetbrains.kotlin.script.adjustByDefinition
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.findScriptDefinition
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.ScriptContentLoader
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.ScriptReportSink
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.adjustByDefinition
 import java.io.File
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read

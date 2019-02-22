@@ -163,7 +163,7 @@ class ScriptingCompilerPluginTest : TestCaseWithTmpdir() {
             addJvmClasspathRoots(runtimeClasspath)
             addJvmClasspathRoots(scriptingClasspath)
             addJvmClasspathRoot(defsOut)
-            addAll(JVMConfigurationKeys.SCRIPT_DEFINITIONS, lazyDefs)
+            addAll(ScriptingConfigurationKeys.SCRIPT_DEFINITIONS, lazyDefs)
         }
 
         val res = KotlinToJVMBytecodeCompiler.compileBunchOfSources(scriptsCompileEnv)

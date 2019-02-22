@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.idea.core.script.ScriptDefinitionsManager;
 import org.jetbrains.kotlin.idea.core.script.settings.KotlinScriptingSettings;
-import org.jetbrains.kotlin.script.KotlinScriptDefinition;
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition;
 
 import javax.swing.*;
 import java.awt.*;

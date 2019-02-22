@@ -12,11 +12,11 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.daemon.TestMessageCollector
-import org.jetbrains.kotlin.script.KotlinScriptDefinition
 import org.jetbrains.kotlin.script.loadScriptingPlugin
+import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingConfigurationKeys
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.KotlinScriptDefinitionAdapterFromNewAPI
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
@@ -82,7 +82,7 @@ class ScriptCliCompilationTest : KtUsefulTestCase() {
                     ),
                     hostConfiguration
                 )
-                add(JVMConfigurationKeys.SCRIPT_DEFINITIONS, scriptDefinition)
+                add(ScriptingConfigurationKeys.SCRIPT_DEFINITIONS, scriptDefinition)
             }
             loadScriptingPlugin(this)
         }
