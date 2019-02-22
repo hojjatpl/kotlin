@@ -16,18 +16,23 @@
 
 package org.jetbrains.kotlin.idea.debugger
 
-import com.intellij.debugger.engine.AsyncStackTraceProvider
 import com.intellij.debugger.engine.JavaValue
 import com.intellij.debugger.memory.utils.StackFrameItem
 import com.intellij.execution.process.ProcessOutputTypes
+import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.util.io.FileUtil
-import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstance
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 import org.jetbrains.kotlin.utils.getSafe
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 
 abstract class AbstractAsyncStackTraceTest : KotlinDebuggerTestBase() {
     private companion object {
         const val MARGIN = "    "
+
+        // Absent in 182, should be AsyncStackTraceProvider.EP.name
+        const val ASYNC_STACKTRACE_EP_NAME = "com.intellij.debugger.asyncStackTraceProvider"
     }
 
     protected fun doTest(path: String) {
@@ -37,17 +42,35 @@ abstract class AbstractAsyncStackTraceTest : KotlinDebuggerTestBase() {
         createAdditionalBreakpoints(fileText)
         createDebugProcess(path)
 
-        val asyncStackTraceProvider = AsyncStackTraceProvider.EP.extensionList
-            .firstIsInstance<KotlinCoroutinesAsyncStackTraceProvider>()
+        val area = Extensions.getArea(null)
+        if (!area.hasExtensionPoint(ASYNC_STACKTRACE_EP_NAME)) {
+            System.err.println("$ASYNC_STACKTRACE_EP_NAME extension point is not found (probably old IDE version)")
+            finish()
+            return
+        }
+
+        val extensionPoint = area.getExtensionPoint<Any>(ASYNC_STACKTRACE_EP_NAME)
+        val asyncStackTraceProvider = extensionPoint.extensions.firstIsInstanceOrNull<KotlinCoroutinesAsyncStackTraceProvider>()
+            ?: run {
+                System.err.println("Kotlin coroutine async stack trace provider is not found")
+                finish()
+                return
+            }
 
         doOnBreakpoint {
             val frameProxy = this.frameProxy
             if (frameProxy != null) {
-                val stackTrace = asyncStackTraceProvider.getAsyncStackTrace(frameProxy, this)
-                if (stackTrace != null && stackTrace.isNotEmpty()) {
-                    print(renderAsyncStackTrace(stackTrace), ProcessOutputTypes.SYSTEM)
-                } else {
-                    println("No async stack trace available", ProcessOutputTypes.SYSTEM)
+                try {
+                    val stackTrace = asyncStackTraceProvider.getAsyncStackTrace(frameProxy, this)
+                    if (stackTrace != null && stackTrace.isNotEmpty()) {
+                        print(renderAsyncStackTrace(stackTrace), ProcessOutputTypes.SYSTEM)
+                    } else {
+                        println("No async stack trace available", ProcessOutputTypes.SYSTEM)
+                    }
+                } catch (e: Throwable) {
+                    val stackTrace = e.stackTraceAsString()
+                    System.err.println("Exception occurred on calculating async stack traces: $stackTrace")
+                    throw e
                 }
             } else {
                 println("FrameProxy is 'null', can't calculate async stack trace", ProcessOutputTypes.SYSTEM)
@@ -55,6 +78,12 @@ abstract class AbstractAsyncStackTraceTest : KotlinDebuggerTestBase() {
 
             resume(this)
         }
+    }
+
+    private fun Throwable.stackTraceAsString(): String {
+        val writer = StringWriter()
+        printStackTrace(PrintWriter(writer))
+        return writer.toString()
     }
 
     private fun renderAsyncStackTrace(trace: List<StackFrameItem>) = buildString {
