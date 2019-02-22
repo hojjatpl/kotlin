@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.idea.debugger.evaluate.variables
 
+import com.intellij.debugger.impl.DebuggerUtilsEx
 import com.sun.jdi.*
 import org.jetbrains.kotlin.fileClasses.internalNameWithoutInnerClasses
 import org.jetbrains.kotlin.idea.debugger.evaluate.ExecutionContext
@@ -161,7 +162,10 @@ class EvaluatorValueConverter(private val executionContext: ExecutionContext) {
         fun wrapRef(value: Value?, refTypeClass: ClassType): Value? {
             val constructor = refTypeClass.methods().single { it.isConstructor }
             val ref = refTypeClass.newInstance(executionContext.thread, constructor, emptyList(), executionContext.invokePolicy)
-            executionContext.evaluationContext.keep(ref)
+
+            @Suppress("DEPRECATION")
+            DebuggerUtilsEx.keep(ref, executionContext.evaluationContext)
+
             val elementField = refTypeClass.fieldByName("element") ?: error("'element' field not found")
             ref.setValue(elementField, value)
             return ref
