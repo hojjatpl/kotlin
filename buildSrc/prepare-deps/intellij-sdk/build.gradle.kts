@@ -239,7 +239,7 @@ val prepareIvyXmls by tasks.creating {
             writeIvyXml(intellij.name,
                         intellij.name,
                         fileTree(libDir).filter {
-                            it.parentFile == libDir && !it.name.startsWith("kotlin-")
+                            it.parentFile == libDir && shouldIncludeIntellijJar(it)
                         },
                         libDir,
                         *sources)
@@ -254,7 +254,7 @@ val prepareIvyXmls by tasks.creating {
             writeIvyXml(intellij.name, // important! the module name should be "intellij"
                         intellijUltimate.name,
                         fileTree(libDir).filter {
-                            it.parentFile == libDir && !it.name.startsWith("kotlin-")
+                            it.parentFile == libDir && shouldIncludeIntellijJar(it)
                         },
                         libDir,
                         *sources)
@@ -274,6 +274,9 @@ val prepareIvyXmls by tasks.creating {
         }
     }
 }
+
+fun shouldIncludeIntellijJar(jar: File) =
+    !jar.name.startsWith("kotlin-") && jar.name != "annotations.jar"
 
 val build by tasks.creating {
     dependsOn(prepareIvyXmls)
