@@ -34,6 +34,9 @@ import org.jetbrains.kotlin.script.util.templates.BindingsScriptTemplateWithLoca
 import org.jetbrains.kotlin.script.util.templates.StandardArgsScriptTemplateWithLocalResolving
 import org.jetbrains.kotlin.script.util.templates.StandardArgsScriptTemplateWithMavenResolving
 import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingCompilerConfigurationComponentRegistrar
+import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingConfigurationKeys
+import org.jetbrains.kotlin.scripting.compiler.plugin.resolve.KotlinScriptDefinitionFromAnnotatedTemplate
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
 import org.jetbrains.kotlin.utils.PathUtil.getResourcePathForClass
 import org.junit.Assert
 import org.junit.Test
@@ -115,9 +118,9 @@ done
                               KotlinScriptDefinitionFromAnnotatedTemplate(scriptTemplate, environment), suppressOutput)
 
     private fun compileScriptImpl(
-            scriptPath: String,
-            scriptDefinition: KotlinScriptDefinition,
-            suppressOutput: Boolean
+        scriptPath: String,
+        scriptDefinition: KotlinScriptDefinition,
+        suppressOutput: Boolean
     ): Class<*>? {
         val messageCollector =
                 if (suppressOutput) MessageCollector.NONE
