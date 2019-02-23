@@ -58,7 +58,7 @@ open class KotlinScriptDefinitionFromAnnotatedTemplate(
         return when (resolver) {
             is AsyncDependenciesResolver -> AsyncDependencyResolverWrapper(resolver)
             is DependenciesResolver -> resolver
-            else -> throw IllegalStateException("Unsupported script dependencies resolver: $resolver")
+            else -> resolver?.let(::ApiChangeDependencyResolverWrapper)
         }
     }
 
