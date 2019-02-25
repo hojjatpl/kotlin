@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.name.Name
 
 class JavaClassUseSiteScope(
     session: FirSession,
-    private val superTypesScope: FirScope,
+    internal val superTypesScope: FirScope,
     private val declaredMemberScope: FirClassDeclaredMemberScope
 ) : FirAbstractProviderBasedScope(session, lookupInFir = true) {
     //base symbol as key, overridden as value
@@ -69,7 +69,7 @@ class JavaClassUseSiteScope(
                 }
     }
 
-    private fun ConeFunctionSymbol.isOverridden(seen: Set<ConeFunctionSymbol>): ConeCallableSymbol? {
+    internal fun ConeFunctionSymbol.getOverridden(seen: Set<ConeFunctionSymbol>): ConeCallableSymbol? {
         if (overrides.containsKey(this)) return overrides[this]
 
         fun sameReceivers(memberTypeRef: FirTypeRef?, selfTypeRef: FirTypeRef?): Boolean {
@@ -82,7 +82,7 @@ class JavaClassUseSiteScope(
         val self = (this as FirFunctionSymbol).fir as FirNamedFunction
         val overriding = seen.firstOrNull {
             val member = (it as FirFunctionSymbol).fir as FirNamedFunction
-            member.isOverride && self.modality != Modality.FINAL
+            self.modality != Modality.FINAL
                     && sameReceivers(member.receiverTypeRef, self.receiverTypeRef)
                     && isSubtypeOf(member.returnTypeRef, self.returnTypeRef)
                     && isOverriddenFunCheck(member, self)
@@ -101,7 +101,7 @@ class JavaClassUseSiteScope(
 
         return superTypesScope.processFunctionsByName(name) {
 
-            val overriddenBy = it.isOverridden(seen)
+            val overriddenBy = it.getOverridden(seen)
             if (overriddenBy == null) {
                 processor(it)
             } else {

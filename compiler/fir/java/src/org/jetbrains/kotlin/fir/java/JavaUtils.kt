@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinTypeProjection
 import org.jetbrains.kotlin.fir.types.impl.ConeClassTypeImpl
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.load.java.structure.*
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 
@@ -38,12 +39,20 @@ internal val JavaClass.classKind: ClassKind
         else -> ClassKind.CLASS
     }
 
+internal fun ClassId.toConeKotlinType(
+    session: FirSession,
+    typeArguments: Array<ConeKotlinTypeProjection>,
+    isNullable: Boolean
+): ConeKotlinType {
+    val symbol = session.service<FirSymbolProvider>().getClassLikeSymbolByFqName(this) as? ConeClassSymbol
+    return if (symbol == null) ConeKotlinErrorType("Symbol not found, for `$this`")
+    else ConeClassTypeImpl(symbol, typeArguments, isNullable)
+}
+
 internal fun JavaClassifierType.toConeKotlinType(session: FirSession, isNullable: Boolean = false): ConeKotlinType {
     return when (val classifier = classifier) {
         is JavaClass -> {
-            val symbol = session.service<FirSymbolProvider>().getClassLikeSymbolByFqName(classifier.classId!!) as? ConeClassSymbol
-            if (symbol == null) ConeKotlinErrorType("Symbol not found, for `${classifier.classId}`")
-            else ConeClassTypeImpl(symbol, typeArguments.map { it.toConeProjection(session) }.toTypedArray(), isNullable)
+            classifier.classId!!.toConeKotlinType(session, typeArguments.map { it.toConeProjection(session) }.toTypedArray(), isNullable)
         }
         is JavaTypeParameter -> {
             // TODO: it's unclear how to identify type parameter by the symbol

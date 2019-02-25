@@ -18,9 +18,12 @@ import org.jetbrains.kotlin.fir.java.declarations.FirJavaValueParameter
 import org.jetbrains.kotlin.fir.java.scopes.JavaClassUseSiteScope
 import org.jetbrains.kotlin.fir.java.types.FirJavaTypeRef
 import org.jetbrains.kotlin.fir.resolve.transformers.FirAbstractTreeTransformerWithSuperTypes
+import org.jetbrains.kotlin.fir.scopes.ProcessorAction
 import org.jetbrains.kotlin.fir.scopes.impl.FirClassDeclaredMemberScope
 import org.jetbrains.kotlin.fir.scopes.impl.FirCompositeScope
+import org.jetbrains.kotlin.fir.symbols.ConeFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.transformInplaceWithBeforeOperation
 import org.jetbrains.kotlin.fir.transformSingle
 import org.jetbrains.kotlin.fir.types.ConeClassErrorType
@@ -33,11 +36,14 @@ import org.jetbrains.kotlin.fir.visitors.compose
 import org.jetbrains.kotlin.load.java.*
 import org.jetbrains.kotlin.load.java.structure.JavaClassifierType
 import org.jetbrains.kotlin.load.java.structure.JavaPrimitiveType
+import org.jetbrains.kotlin.load.java.structure.JavaType
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifier
 import org.jetbrains.kotlin.load.java.typeEnhancement.NullabilityQualifierWithMigrationStatus
 import org.jetbrains.kotlin.load.java.typeEnhancement.PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE
 import org.jetbrains.kotlin.load.java.typeEnhancement.PredefinedFunctionEnhancementInfo
 import org.jetbrains.kotlin.load.kotlin.SignatureBuildingComponents
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.Jsr305State
 import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 
@@ -47,6 +53,8 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
 
     private val typeQualifierResolver = FirAnnotationTypeQualifierResolver(jsr305State)
 
+    private val visitedClasses = mutableSetOf<FirJavaClass>()
+
     private fun FirRegularClass.buildUseSiteScope(useSiteSession: FirSession = session): JavaClassUseSiteScope {
         val superTypeScope = FirCompositeScope(mutableListOf())
         val declaredScope = FirClassDeclaredMemberScope(this, useSiteSession)
@@ -55,6 +63,7 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
                 if (useSiteSuperType is ConeClassErrorType) return@mapNotNullTo null
                 val symbol = useSiteSuperType.symbol
                 if (symbol is FirClassSymbol) {
+                    symbol.fir.accept(this@FirJavaTypeEnhancementTransformer, null)
                     symbol.fir.buildUseSiteScope(useSiteSession)
                 } else {
                     null
@@ -66,7 +75,8 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
     private val regularClassStack = mutableListOf<FirRegularClass>()
 
     override fun transformRegularClass(regularClass: FirRegularClass, data: Nothing?): CompositeTransformResult<FirDeclaration> {
-        if (regularClass !is FirJavaClass) return regularClass.compose()
+        if (regularClass !is FirJavaClass || regularClass in visitedClasses) return regularClass.compose()
+        visitedClasses += regularClass
         return withScopeCleanup {
             towerScope.scopes += regularClass.buildUseSiteScope()
             regularClassStack += regularClass
@@ -144,19 +154,36 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
         return super.transformValueParameter(valueParameter, data)
     }
 
-    private fun FirTypeRef.toResolvedTypeRef(): FirResolvedTypeRef =
-        when (this) {
-            is FirResolvedTypeRef -> this
-            is FirJavaTypeRef -> {
-                // TODO: other types are also possible here
-                val javaType = type as JavaClassifierType
-                val upperBoundType = javaType.toConeKotlinType(session, isNullable = true)
-                val lowerBoundType = javaType.toConeKotlinType(session, isNullable = false)
+    private fun JavaType.toResolvedTypeRef(session: FirSession, annotations: List<FirAnnotationCall>): FirResolvedTypeRef {
+        return when (this) {
+            is JavaClassifierType -> {
+                val upperBoundType = toConeKotlinType(session, isNullable = true)
+                val lowerBoundType = toConeKotlinType(session, isNullable = false)
                 FirResolvedTypeRefImpl(
                     session, null, ConeFlexibleType(lowerBoundType, upperBoundType),
                     isMarkedNullable = false,
                     annotations = annotations
                 )
+            }
+            is JavaPrimitiveType -> {
+                val primitiveType = type
+                val kotlinPrimitiveName = when (val javaName = primitiveType?.typeName?.asString()) {
+                    null -> "Unit"
+                    else -> javaName.capitalize()
+                }
+                val classId = ClassId(FqName("kotlin"), FqName(kotlinPrimitiveName), false)
+                val coneType = classId.toConeKotlinType(session, emptyArray(), false)
+                FirResolvedTypeRefImpl(session, null, coneType, isMarkedNullable = false, annotations = annotations)
+            }
+            else -> error("Strange JavaType: ${this::class.java}")
+        }
+    }
+
+    private fun FirTypeRef.toResolvedTypeRef(): FirResolvedTypeRef =
+        when (this) {
+            is FirResolvedTypeRef -> this
+            is FirJavaTypeRef -> {
+                type.toResolvedTypeRef(session, annotations)
             }
             else -> error("Expected resolved type references in enhancement transformer: ${this::class.java}")
         }
@@ -313,6 +340,29 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
         collector
     )
 
+    private val overriddenMemberCache = mutableMapOf<FirCallableMember, List<FirCallableMember>>()
+
+    private fun FirCallableMember.overriddenMembers(): List<FirCallableMember> {
+        return overriddenMemberCache.getOrPut(this) {
+            val useSiteScope = towerScope.scopes.last() as JavaClassUseSiteScope
+            val result = mutableListOf<FirCallableMember>()
+            if (this is FirNamedFunction) {
+                val superTypesScope = useSiteScope.superTypesScope
+                superTypesScope.processFunctionsByName(this.name) { basicFunctionSymbol ->
+                    val overriddenBy = with(useSiteScope) {
+                        basicFunctionSymbol.getOverridden(setOf(this@overriddenMembers.symbol as ConeFunctionSymbol))
+                    }
+                    val overriddenByFir = (overriddenBy as? FirFunctionSymbol)?.fir
+                    if (overriddenByFir === this@overriddenMembers) {
+                        result += (basicFunctionSymbol as FirFunctionSymbol).fir
+                    }
+                    ProcessorAction.NEXT
+                }
+            }
+            result
+        }
+    }
+
     private fun FirCallableMember.parts(
         typeQualifierResolver: FirAnnotationTypeQualifierResolver,
         typeContainer: FirAnnotationContainer?,
@@ -325,10 +375,9 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
             typeQualifierResolver,
             typeContainer,
             collector(this),
-            emptyList(), // TODO: overridden descriptors
-//            this.overriddenDescriptors.map {
-//                collector(it)
-//            },
+            this.overriddenMembers().map {
+                collector(it)
+            },
             isCovariant,
             // recompute default type qualifiers using type annotations
             containerContext.copyWithNewDefaultTypeQualifiers(
