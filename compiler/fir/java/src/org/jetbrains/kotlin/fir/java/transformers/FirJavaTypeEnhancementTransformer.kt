@@ -163,7 +163,6 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
         val signatureParts = when (val mode = mode) {
             is TransformationMode.Receiver -> {
                 ownerFunction.partsForValueParameter(typeQualifierResolver, typeRef, memberContext) {
-                    // TODO: think which type should be here (just type ref, Java type ref, resolved type ref, cone type
                     it.receiverTypeRef!!.toResolvedTypeRef()
                 }.enhance(this@FirJavaTypeEnhancementTransformer)
             }
