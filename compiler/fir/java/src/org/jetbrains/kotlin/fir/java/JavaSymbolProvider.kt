@@ -241,7 +241,9 @@ class JavaSymbolProvider(
                                     session, valueParameter.name ?: Name.special("<anonymous Java parameter>"),
                                     returnTypeRef = parameterType.toFirJavaTypeRef(),
                                     isVararg = valueParameter.isVararg
-                                )
+                                ).apply {
+                                    addAnnotationsFrom(valueParameter)
+                                }
                             }
                         }
                         declarations += firJavaMethod
