@@ -276,7 +276,7 @@
     <projectService serviceInterface="org.jetbrains.kotlin.idea.core.script.ScriptDependenciesUpdater"
                     serviceImplementation="org.jetbrains.kotlin.idea.core.script.ScriptDependenciesUpdater"/>
 
-    <projectService serviceInterface="org.jetbrains.kotlin.scripting.legacy.ScriptReportSink"
+    <projectService serviceInterface="org.jetbrains.kotlin.scripting.compiler.plugin.resolve.ScriptReportSink"
                     serviceImplementation="org.jetbrains.kotlin.idea.core.script.IdeScriptReportSink"/>
 
     <projectService serviceInterface="org.jetbrains.kotlin.idea.compiler.configuration.KotlinCommonCompilerArgumentsHolder"
