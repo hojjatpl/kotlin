@@ -657,8 +657,10 @@ class FirRenderer(builder: StringBuilder) : FirVisitorVoid() {
                 buildString {
                     append("ft<")
                     append(lowerBound.asString())
+                    append(lowerBound.nullability.suffix)
                     append(", ")
                     append(upperBound.asString())
+                    append(upperBound.nullability.suffix)
                     append(">")
                 }
             }
