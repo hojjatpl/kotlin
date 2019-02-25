@@ -30,13 +30,13 @@ fun <T : FirElement, D> MutableList<T>.transformInplace(transformer: FirTransfor
 }
 
 fun <T : FirElement, D> MutableList<T>.transformInplaceWithBeforeOperation(
-    transformer: FirTransformer<D>, data: D, operation: (Int) -> Unit
+    transformer: FirTransformer<D>, data: D, operation: (T, Int) -> Unit
 ) {
     val iterator = this.listIterator()
     var index = 0
     while (iterator.hasNext()) {
         val next = iterator.next()
-        operation(index++)
+        operation(next, index++)
         val result = next.transform<T, D>(transformer, data)
         if (result.isSingle) {
             iterator.set(result.single)

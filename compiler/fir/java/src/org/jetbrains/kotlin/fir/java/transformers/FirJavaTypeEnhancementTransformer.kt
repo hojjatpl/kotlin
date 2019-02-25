@@ -92,6 +92,8 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
 
     private lateinit var ownerFunction: FirNamedFunction
 
+    private lateinit var ownerParameter: FirValueParameter
+
     private lateinit var memberContext: FirJavaEnhancementContext
 
     override fun transformNamedFunction(namedFunction: FirNamedFunction, data: Nothing?): CompositeTransformResult<FirDeclaration> {
@@ -126,8 +128,9 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
         mode = TransformationMode.Receiver
         namedFunction.receiverTypeRef = namedFunction.receiverTypeRef?.transformSingle(this, null)
 
-        namedFunction.valueParameters.transformInplaceWithBeforeOperation(this, null) { index ->
+        namedFunction.valueParameters.transformInplaceWithBeforeOperation(this, null) { parameter, index ->
             mode = TransformationMode.ValueParameter(index)
+            ownerParameter = parameter
         }
 
         mode = TransformationMode.ReturnType
@@ -145,6 +148,7 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
         when (this) {
             is FirResolvedTypeRef -> this
             is FirJavaTypeRef -> {
+                // TODO: other types are also possible here
                 val javaType = type as JavaClassifierType
                 val upperBoundType = javaType.toConeKotlinType(session, isNullable = true)
                 val lowerBoundType = javaType.toConeKotlinType(session, isNullable = false)
@@ -162,12 +166,21 @@ class FirJavaTypeEnhancementTransformer(session: FirSession) : FirAbstractTreeTr
 
         val signatureParts = when (val mode = mode) {
             is TransformationMode.Receiver -> {
-                ownerFunction.partsForValueParameter(typeQualifierResolver, typeRef, memberContext) {
+                ownerFunction.partsForValueParameter(
+                    typeQualifierResolver,
+                    // TODO: check me
+                    parameterContainer = ownerFunction,
+                    methodContext = memberContext
+                ) {
                     it.receiverTypeRef!!.toResolvedTypeRef()
                 }.enhance(this@FirJavaTypeEnhancementTransformer)
             }
             is TransformationMode.ValueParameter -> {
-                ownerFunction.partsForValueParameter(typeQualifierResolver, typeRef, memberContext) {
+                ownerFunction.partsForValueParameter(
+                    typeQualifierResolver,
+                    parameterContainer = ownerParameter,
+                    methodContext = memberContext
+                ) {
                     it.valueParameters[mode.index].returnTypeRef.toResolvedTypeRef()
                 }.enhance(this@FirJavaTypeEnhancementTransformer, predefinedEnhancementInfo?.parametersInfo?.getOrNull(mode.index))
             }
