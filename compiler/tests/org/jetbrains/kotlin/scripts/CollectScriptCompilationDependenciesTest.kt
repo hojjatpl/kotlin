@@ -11,7 +11,9 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.jvmClasspathRoots
 import org.jetbrains.kotlin.script.loadScriptingPlugin
+import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingConfigurationKeys
 import org.jetbrains.kotlin.scripting.compiler.plugin.definitions.KotlinScriptDefinitionAdapterFromNewAPI
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind

@@ -26,6 +26,9 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler
 import org.jetbrains.kotlin.codegen.CompilationException
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.script.loadScriptingPlugin
+import org.jetbrains.kotlin.scripting.compiler.plugin.ScriptingConfigurationKeys
+import org.jetbrains.kotlin.scripting.legacy.KotlinScriptDefinition
+import org.jetbrains.kotlin.scripting.legacy.StandardScriptDefinition
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
@@ -84,11 +87,11 @@ class ScriptTest : KtUsefulTestCase() {
     }
 
     private fun compileScript(
-            scriptPath: String,
-            scriptDefinition: KotlinScriptDefinition,
-            runIsolated: Boolean = true,
-            suppressOutput: Boolean = false,
-            saveClassesDir: File? = null
+        scriptPath: String,
+        scriptDefinition: KotlinScriptDefinition,
+        runIsolated: Boolean = true,
+        suppressOutput: Boolean = false,
+        saveClassesDir: File? = null
     ): Class<*>? {
         val messageCollector =
                 if (suppressOutput) MessageCollector.NONE
